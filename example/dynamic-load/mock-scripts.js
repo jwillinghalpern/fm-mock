@@ -8,6 +8,21 @@ const fmMock = new FMMock();
 //   global JS functions from here to pass data "back in" to the WV.
 // It's good to call functions by name  since that's what FM does:
 //   e.g. window['fnName']
+
+fmMock.registerScript('Create Record', () => {
+  const id = parseInt(Math.random() * 10000000);
+  const message = `MOCK: Record created. id: ${id}`;
+  window['updateMessage'](message);
+});
+
+fmMock.registerScript('Delete Record', (param) => {
+  const message =
+    param === 234
+      ? `MOCK: Sorry, you don't have permission: Param: ${param}`
+      : `MOCK: Delete successful! Param: ${param}`;
+  window['updateMessage'](message);
+});
+
 fmMock.registerScript('Fetch Records', (param) => {
   const resolvePromise = true;
   setTimeout(() => {
@@ -27,20 +42,4 @@ fmMock.registerScript('Fetch Records', (param) => {
       );
     else fn('Rejected by MOCK FileMaker');
   }, 750);
-});
-
-fmMock.registerScript('Delete Record', (param) => {
-  if (param === 123) {
-  }
-  const message =
-    param === 234
-      ? `MOCK: Sorry, you don't have permission: Param: ${param}`
-      : `MOCK: Delete successful! Param: ${param}`;
-  window['updateMessage'](message);
-});
-
-fmMock.registerScript('Create Record', (param) => {
-  const id = parseInt(Math.random() * 10000000);
-  const message = `MOCK: Record created. id: ${id}`;
-  window['updateMessage'](message);
 });
