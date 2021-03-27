@@ -8,7 +8,6 @@ const fmMock = new FMMock();
 //   global JS functions from here to pass data "back in" to the WV.
 // It's good to call functions by name  since that's what FM does:
 //   e.g. window['fnName']
-
 fmMock.registerScript('Create Record', () => {
   const id = parseInt(Math.random() * 10000000);
   const message = `MOCK: Record created. id: ${id}`;

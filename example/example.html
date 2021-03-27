@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>😬 FM-MOCK 😬</title>
-    <link rel="stylesheet" href="../example.css" />
+    <link rel="stylesheet" href="./example.css" />
   </head>
 
   <body>
@@ -53,11 +53,11 @@
     <script>
       (() => {
         // FM-MOCK, dynamically loaded in html.
-        //   Since mocks should only call global functions, this can be loaded
-        //   in a different scope than the code above.
+        //   Since mocks should only call global functions anyway, this can be
+        //   loaded in a different scope than the code above.
         // (There are better ways to load JS with webpack, React/Svelte)
         let myScript = document.createElement('script');
-        myScript.setAttribute('src', '../fm-mock.js');
+        myScript.setAttribute('src', '../dist/fm-mock.js');
         document.body.appendChild(myScript);
 
         myScript = document.createElement('script');
