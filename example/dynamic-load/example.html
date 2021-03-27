@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>😬 FM-MOCK 😬</title>
+    <link rel="stylesheet" href="../example.css" />
+  </head>
+
+  <body>
+    <button id="fetchButton">Fetch Records</button>
+    <button id="createRecordButton">Create Record</button>
+    <button id="deleteSuccessButton" class="orange">Delete Success</button>
+    <button id="deleteFailButton" class="orange">Delete Fail</button>
+    <div id="message" class="message">Click the button to get a message</div>
+    <div id="loader" class="loader" hidden>Loading...</div>
+
+    <script>
+      (function () {
+        showLoader = () => (document.getElementById('loader').hidden = false);
+        hideLoader = () => (document.getElementById('loader').hidden = true);
+
+        // Global functions exposed to FileMaker
+        window.updateMessage = (message) => {
+          document.getElementById('message').innerHTML = message;
+        };
+        window.updateMessageAndHideLoader = (message) => {
+          updateMessage(message);
+          hideLoader();
+        };
+
+        // Buttons
+        function handleFetchButton() {
+          showLoader();
+          updateMessage('Fetching records...');
+          const param = JSON.stringify({ message: 'hi, please return data.' });
+          FileMaker.PerformScript('Fetch Records', param);
+        }
+        document.getElementById('fetchButton').onclick = handleFetchButton;
+        document.getElementById('createRecordButton').onclick = function () {
+          FileMaker.PerformScriptWithOption('Create Record', 123, 0);
+        };
+        document.getElementById('deleteFailButton').onclick = function () {
+          FileMaker.PerformScript('Delete Record', 234);
+        };
+        document.getElementById('deleteSuccessButton').onclick = function () {
+          FileMaker.PerformScript('Delete Record', 345);
+        };
+      })();
+    </script>
+
+    <script>
+      (() => {
+        // FM-MOCK, dynamically loaded in html.
+        //   Since mocks should only call global functions, this can be loaded
+        //   in a different scope than the code above.
+        // (There are better ways to load JS with webpack, React/Svelte)
+        let myScript = document.createElement('script');
+        myScript.setAttribute('src', '../fm-mock.js');
+        document.body.appendChild(myScript);
+
+        myScript = document.createElement('script');
+        myScript.setAttribute('src', './mock-scripts.js');
+        document.body.appendChild(myScript);
+
+        let mockWarning = document.createElement('footer');
+        mockWarning.className = 'footer';
+        mockWarning.innerText = 'USING MOCK!';
+        document.body.appendChild(mockWarning);
+      })();
+    </script>
+  </body>
+</html>

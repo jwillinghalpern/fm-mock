@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>😬 FM-MOCK 😬</title>
+    <link rel="stylesheet" href="../example.css" />
+  </head>
+
+  <body>
+    <button id="fetchButton">Fetch Records</button>
+    <button id="createRecordButton">Create Record</button>
+    <button id="deleteRecordButton">Delete Record</button>
+    <div id="message" class="message">Click the button to get a message</div>
+    <div id="loader" class="loader" hidden>Loading...</div>
+
+    <!-- import the fm-mock lib -->
+    <script src="../fm-mock.js"></script>
+
+    <script>
+      (function () {
+        // #####################################################################
+        // FMMock stuff
+        // #####################################################################
+        // instantiating FMMock replaces window.FileMaker automatically
+        const fmMock = new FMMock();
+
+        // Register some mock FM scripts. Note: FM can only pass data via
+        //   Perform JavaScript In Webviewer[], so to simulate this only call
+        //   global JS functions from here to pass data "back in" to the WV.
+        fmMock.registerScript('Fetch Records', (param) => {
+          const resolvePromise = true;
+          setTimeout(() => {
+            const json = {
+              data: [
+                { id: 1, name: 'Joshy' },
+                { id: 2, name: 'Bijou' },
+                { id: 3, name: 'Wally' },
+              ],
+            };
+            const response = JSON.stringify(json, null, 2);
+            // this function syntax allows this code to live in a different file
+            const fn = window['updateMessageAndHideLoader'];
+            if (resolvePromise)
+              fn(
+                `MOCK: Thanks for sending this param:<br>${param}.<br><br>Here is your response:<br><pre>${response}</pre>`
+              );
+            else fn('Rejected by MOCK FileMaker');
+          }, 750);
+        });
+
+        fmMock.registerScript('Delete Record', (param) => {
+          const message = `MOCK: Sorry, you don't have permission: Param: ${param}`;
+          window['updateMessage'](message);
+        });
+
+        fmMock.registerScript('Create Record', (param) => {
+          const id = parseInt(Math.random() * 10000000);
+          const message = `MOCK: Record created. id: ${id}`;
+          window['updateMessage'](message);
+        });
+
+        // #####################################################################
+        // Regular stuff
+        // #####################################################################
+        showLoader = () => (document.getElementById('loader').hidden = false);
+        hideLoader = () => (document.getElementById('loader').hidden = true);
+        // To expose functions to FM within an IIFE, explicitly attach to window
+        //   Anything called by the mock functions should be like this.
+        window.updateMessage = (message) => {
+          document.getElementById('message').innerHTML = message;
+        };
+        window.updateMessageAndHideLoader = (message) => {
+          updateMessage(message);
+          hideLoader();
+        };
+
+        // Buttons
+        function handleFetchButton() {
+          showLoader();
+          updateMessage('Fetching records...');
+          const param = JSON.stringify({ message: 'hi, please return data.' });
+          FileMaker.PerformScript('Fetch Records', param);
+        }
+        document.getElementById('fetchButton').onclick = handleFetchButton;
+        document.getElementById('createRecordButton').onclick = function () {
+          FileMaker.PerformScriptWithOption('Create Record', 123, 0);
+        };
+        document.getElementById('deleteRecordButton').onclick = function () {
+          FileMaker.PerformScript('Delete Record', 234);
+        };
+      })();
+    </script>
+  </body>
+</html>
