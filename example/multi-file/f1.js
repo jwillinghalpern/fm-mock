@@ -1,10 +1,10 @@
 const fmMock = require('../../dist/fm-mock.js');
 
 // // you can also import like this if you're using ecmascript module syntax
-// import * as fmMock from '../dist/fm-mock.mjs';
+// import * as fmMock from '../../dist/fm-mock.mjs';
 
 // // or import the named exports directly so you don't have to prefix fmMock.*
-// import { registerScript, applyMock } as fmMock from '../dist/fm-mock.mjs';
+// import { registerScript, applyMock } as fmMock from '../../dist/fm-mock.mjs';
 
 fmMock.applyMock();
 
