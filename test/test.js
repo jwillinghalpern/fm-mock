@@ -1,40 +1,47 @@
 /* eslint-disable no-undef */
 import { assert } from 'chai';
-import FMMock from '../src/fm-mock';
+import { applyMock, registerScript } from '../src/fm-mock';
 
-const fmMock = new FMMock();
+applyMock();
 const scriptName = 'My Script';
-const res = 'hello world';
-const fn = () => res;
-fmMock.registerScript('My Script', fn);
+const fn = () => 'hello world';
+registerScript('My Script', fn);
 
-describe('FMMock', () => {
-  describe('constructor', () => {
-    it('should return an object with fmScripts obj', () => {
-      assert.hasAllKeys(fmMock, ['fmScripts'], 'missing some keys');
-    });
+describe('mock window.FileMaker', () => {
+  it('isMock should be true', () => {
+    assert.isTrue(window.FileMaker.isMock, 'isMock not true');
   });
-  describe('registerScripts', () => {
-    it('should add a script to fmScripts', () => {
-      assert.strictEqual(
-        fmMock.fmScripts[scriptName],
-        fn,
-        "function didn't match"
-      );
-      assert.strictEqual(
-        fmMock.fmScripts[scriptName](),
-        fn(),
-        "output didn't match"
-      );
-    });
+  it('registeredScripts should be an object', () => {
+    assert.isObject(window.FileMaker.registeredScripts);
   });
-  describe('window.FileMaker.PerformScript', () => {
-    it('should call the mock script', () => {
-      assert.strictEqual(
-        window.FileMaker.PerformScript(scriptName),
-        fmMock.performScriptWithOption(scriptName),
-        'function did not return same result'
-      );
-    });
+  it('PerformScirpt should be a function', () => {
+    assert.isFunction(window.FileMaker.PerformScript);
+  });
+  it('PerformScriptWithOption should be a function', () => {
+    assert.isFunction(window.FileMaker.PerformScriptWithOption);
+  });
+});
+describe('registerScript', () => {
+  it('should add a script to window.FileMaker.registeredScripts', () => {
+    assert.strictEqual(
+      window.FileMaker.registeredScripts[scriptName],
+      fn,
+      "function didn't match"
+    );
+    assert.strictEqual(
+      window.FileMaker.registeredScripts[scriptName](),
+      fn(),
+      "fn output didn't match"
+    );
+  });
+});
+describe('window.FileMaker.PerformScript', () => {
+  it('should call the mock script', () => {
+    assert.strictEqual(
+      window.FileMaker.PerformScript(scriptName),
+      // fmMock.performScriptWithOption(scriptName),
+      fn(),
+      'function did not return same result'
+    );
   });
 });
