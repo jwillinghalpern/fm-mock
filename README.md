@@ -7,9 +7,9 @@ This can be especially useful if you're developiong in a framework like ReactJS 
 
 ## Try
 
-Open ./example/index.html in your browser. The javascript in this file calls FileMaker.PerformScript and successfully gets data despite running outside of a webviewer.
+Open `./example/index.html` in your browser. The javascript in this file calls FileMaker.PerformScript and successfully gets data despite running outside of a webviewer.
 
-Open FMMock.fmp12. This webviewer runs the same html code, but index.css has been inlined in a `<style>` tag and the last `<script>` block (the one that loads the mock scripts) has been disabled. With that code disabled, the JS uses the default FileMaker.PerformScript and calls real FM scripts.
+Open `./example/FMMock.fmp12`. This webviewer runs the same html code, but index.css has been inlined in a `<style>` tag and the last `<script>` block (the one that loads the mock scripts) has been disabled. With that code disabled, the JS uses the default FileMaker.PerformScript and calls real FM scripts.
 
 Run `npm run example-multi` to see how it works in a multi-file environment. Look at `./exampl/multi-file/*` to see how this works.
 
