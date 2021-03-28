@@ -36,13 +36,13 @@ Once the code is imported, creating an instance of FMMock will immediately repla
     FMMock.register('Create Record', () => {
         const res = JSON.stringify({"newRecordID": 123});
         // mock scripts should call global functions, just like FM must
-        window.addRecordToUI();
+        window.addRecordToUI(res);
     });
     FMMock.register('Delete Record', () => { ... });
 
     // now call your scripts like this
-    window.FileMaker.PerformScript('Create Record', param)
-    window.FileMaker.PerformScriptWithOption('Create Record', param, opt)
+    window.FileMaker.PerformScript('Create Record', param);
+    window.FileMaker.PerformScriptWithOption('Create Record', param, opt);
 
 #### Multi-file usage
 
