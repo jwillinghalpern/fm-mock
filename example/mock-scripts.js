@@ -9,7 +9,7 @@ const fmMock = new FMMock();
 // It's good to call functions by name  since that's what FM does:
 //   e.g. window['fnName']
 fmMock.registerScript('Create Record', () => {
-  const id = parseInt(Math.random() * 10000000);
+  const id = Math.floor(Math.random() * (999 - 100 + 1) + 100);
   const message = `MOCK: Record created. id: ${id}`;
   window['updateMessage'](message);
 });
