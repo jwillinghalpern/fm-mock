@@ -10,9 +10,6 @@ module.exports = [
       library: {
         name: 'FMMock',
         type: 'umd',
-        export: 'default',
-        // // https://webpack.js.org/configuration/output/#outputlibraryumdnameddefine
-        // umdNamedDefine: true,
       },
     },
     module: {
