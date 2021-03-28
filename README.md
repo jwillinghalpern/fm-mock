@@ -1,5 +1,7 @@
 # fm-mock
 
+WebViewer-less development for WebViewers
+
 (NOTE: this project is v0 and may change significantly before release)
 
 A library for mocking the window.FileMaker object. This lets you develop FileMaker webviewer apps in the browser.
