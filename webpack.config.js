@@ -34,7 +34,6 @@ module.exports = [
       filename: 'fm-mock.mjs',
       library: {
         type: 'module',
-        // export: 'default',
       },
     },
     experiments: {
