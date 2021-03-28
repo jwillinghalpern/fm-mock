@@ -5,7 +5,8 @@
   "main": "./dist/fm-mock.js",
   "scripts": {
     "test": "mocha --require esm --require jsdom-global/register",
-    "build": "webpack"
+    "build": "webpack",
+    "example-multi": "node -r esm -r jsdom-global/register example/multi-file/index.js"
   },
   "author": "Josh Willing <josh@willingapps.com>",
   "license": "ISC",
