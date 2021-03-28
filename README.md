@@ -23,7 +23,7 @@ You can either import the library in a script tag like this:
 
 Or require the script in your js:
 
-    const FMMock = require('fm-mock')
+    const FMMock = require('fm-mock');
 
 ### Use
 
@@ -54,7 +54,7 @@ Because the mock FileMaker object is global, you can register FM scripts within 
     FMMock.registerScript('Delete Customer', () => {...});
 
     // file2.js
-    var FMMock = require('fm-mock')
+    const FMMock = require('fm-mock');
     FMMock.registerScript('Fetch Customers', () => {...});
     FMMock.registerScript('Find Customer', () => {...});
 
