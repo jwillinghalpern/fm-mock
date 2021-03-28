@@ -1,3 +1,9 @@
+/* eslint-disable no-undef */
+/**
+ * Class for mocking the window.FileMaker object and mocking FM script calls
+ *
+ * @class FMMock
+ */
 class FMMock {
   /**
    * Creates an instance of FMMock.
@@ -15,12 +21,10 @@ class FMMock {
    */
   enable() {
     window.FileMaker = {};
-    window.FileMaker.PerformScriptWithOption = (script, param, option) => {
-      return this.performScriptWithOption(script, param, option);
-    };
-    window.FileMaker.PerformScript = (script, param) => {
-      return this.performScript(script, param);
-    };
+    window.FileMaker.PerformScriptWithOption = (script, param, option) =>
+      this.performScriptWithOption(script, param, option);
+    window.FileMaker.PerformScript = (script, param) =>
+      this.performScript(script, param);
   }
 
   /**
@@ -37,6 +41,16 @@ class FMMock {
     this.fmScripts[scriptName] = functionToCall;
   }
 
+  /**
+   * replacement for FileMaker.PerformScriptWithOption
+   *
+   * @param {string} script
+   * @param {string} param
+   * @param {number} option
+   * @returns {any}
+   * @private
+   * @memberof FMMock
+   */
   performScriptWithOption(script, param, option) {
     const fn = this.fmScripts[script];
     if (fn === undefined)
@@ -44,6 +58,15 @@ class FMMock {
     return fn(param, option);
   }
 
+  /**
+   * replacement for FileMaker.PerformScript
+   *
+   * @param {string} script
+   * @param {string} param
+   * @returns {any}
+   * @private
+   * @memberof FMMock
+   */
   performScript(script, param) {
     const defaultOption = 0;
     return this.performScriptWithOption(script, param, defaultOption);
