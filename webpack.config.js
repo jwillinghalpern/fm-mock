@@ -11,6 +11,7 @@ module.exports = [
         name: 'FMMock',
         type: 'umd',
         export: 'default',
+        // // https://webpack.js.org/configuration/output/#outputlibraryumdnameddefine
         // umdNamedDefine: true,
       },
     },
@@ -22,6 +23,22 @@ module.exports = [
           use: 'babel-loader',
         },
       ],
+    },
+    mode: 'production',
+  },
+  {
+    entry: path.resolve(__dirname, 'src/fm-mock.js'),
+    output: {
+      globalObject: 'this',
+      path: path.resolve(__dirname, 'dist'),
+      filename: 'fm-mock.mjs',
+      library: {
+        type: 'module',
+        // export: 'default',
+      },
+    },
+    experiments: {
+      outputModule: true,
     },
     mode: 'production',
   },
