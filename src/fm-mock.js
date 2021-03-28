@@ -20,7 +20,11 @@ class FMMock {
    * @memberof FMMock
    */
   enable() {
+    const alreadyMocked =
+      typeof window.FileMaker === 'object' && window.FileMaker.isMock;
+    if (alreadyMocked) return;
     window.FileMaker = {};
+    window.FileMaker.isMock = true;
     window.FileMaker.PerformScriptWithOption = (script, param, option) =>
       this.performScriptWithOption(script, param, option);
     window.FileMaker.PerformScript = (script, param) =>
