@@ -1,0 +1,35 @@
+{
+	"extends": [
+		"eslint:recommended",
+		"airbnb",
+		"prettier"
+	],
+	"plugins": [
+		"prettier"
+	],
+	"rules": {
+		"prettier/prettier": "error",
+		"no-unused-vars": "warn",
+		"no-console": "off",
+		"func-names": "off",
+		"no-process-exit": "off",
+		"object-shorthand": "off",
+		"class-methods-use-this": "off",
+		"quotes": [
+			"error",
+			"single",
+			{
+				// so that you can use doublequotes around strings containing singles
+				"avoidEscape": true
+			}
+		]
+	},
+	"env": {
+		"browser": true,
+		"node": true
+	},
+	"parserOptions": {
+		"sourceType": "module",
+		"ecmaVersion": 2015
+	}
+}
