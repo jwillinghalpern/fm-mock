@@ -6,8 +6,6 @@
  * @param {string} param
  * @param {number} option
  * @returns {any}
- * @private
- * @memberof FMMock
  */
 const performScriptWithOption = (script, param, option) => {
   const fn = window.FileMaker.registeredScripts[script];
@@ -22,8 +20,6 @@ const performScriptWithOption = (script, param, option) => {
  * @param {string} script
  * @param {string} param
  * @returns {any}
- * @private
- * @memberof FMMock
  */
 const performScript = (script, param) => {
   const defaultOption = 0;
@@ -36,7 +32,6 @@ const performScript = (script, param) => {
  *
  * @param {string} scriptName FM script name
  * @param {function} functionToCall JS function to call instead
- * @memberof FMMock
  */
 export const registerScript = (scriptName, functionToCall) => {
   if (typeof functionToCall !== 'function')
