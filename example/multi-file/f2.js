@@ -1,6 +1,6 @@
-import { registerScript } from '../../dist/fm-mock.mjs';
+import { mockScript } from '../../dist/fm-mock.mjs';
 
-registerScript('Script 2', () => {
+mockScript('Script 2', () => {
   const cyan = '\x1b[36m%s\x1b[0m';
   console.log(cyan, 'Script 2 called');
   window.globalFunction();

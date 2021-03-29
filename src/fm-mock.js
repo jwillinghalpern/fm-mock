@@ -8,7 +8,7 @@
  * @param {number} option
  */
 const performScriptWithOption = (script, param, option) => {
-  const fn = window.FileMaker.registeredScripts[script];
+  const fn = window.FileMaker.mockedScripts[script];
   if (fn === undefined)
     throw new Error(`The script '${script}' is not registered.`);
   fn(param, option);
@@ -41,7 +41,7 @@ const mockFileMaker = () => {
   if (fmIsMock()) return;
   window.FileMaker = {
     isMock: true,
-    registeredScripts: {},
+    mockedScripts: {},
     PerformScriptWithOption: (script, param, option) =>
       performScriptWithOption(script, param, option),
     PerformScript: (script, param) => performScript(script, param),
@@ -55,9 +55,9 @@ const mockFileMaker = () => {
  * @param {string} scriptName FM script name
  * @param {function} functionToCall JS function to call instead
  */
-export const registerScript = (scriptName, functionToCall) => {
+export const mockScript = (scriptName, functionToCall) => {
   if (typeof functionToCall !== 'function')
     throw new Error('must pass in a real function');
   mockFileMaker();
-  window.FileMaker.registeredScripts[scriptName] = functionToCall;
+  window.FileMaker.mockedScripts[scriptName] = functionToCall;
 };
