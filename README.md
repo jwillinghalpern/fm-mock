@@ -32,12 +32,12 @@ Or require the script in your js:
 Once the code is imported, registering mock scripts will immediately replace the window.FileMaker object and the script will be ready to call.
 
     // register some mock scripts
-    FMMock.register('Create Record', () => {
+    FMMock.registerScript('Create Record', () => {
         const res = JSON.stringify({"newRecordID": 123});
         // mock scripts should call global functions, just like FM must
         window.addRecordToUI(res);
     });
-    FMMock.register('Delete Record', () => { ... });
+    FMMock.registerScript('Delete Record', () => { ... });
 
     // now call your scripts like this
     window.FileMaker.PerformScript('Create Record', param);
