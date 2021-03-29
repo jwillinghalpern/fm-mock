@@ -51,14 +51,16 @@ Once the code is imported, creating an instance of FMMock will immediately repla
 Because the mock FileMaker object is global, you can register FM scripts within different files. This is useful if your app calls lots of different FileMaker scripts. Running `FMMock.applyMock()` from different files and/or multiple times will not overwrite any previous scripts you've registered, so feel free to import and use FMMock in many files.
 
     // file1.js
-    const FMMock = require('fm-mock');
-    FMMock.registerScript('Create Customer', () => {...});
-    FMMock.registerScript('Delete Customer', () => {...});
+    const { applyMock, registerScript } = require('fm-mock');
+    applyMock();
+    registerScript('Create Customer', () => {...});
+    registerScript('Delete Customer', () => {...});
 
     // file2.js
-    const FMMock = require('fm-mock');
-    FMMock.registerScript('Fetch Customers', () => {...});
-    FMMock.registerScript('Find Customer', () => {...});
+    const { applyMock, registerScript } = require('fm-mock');
+    applyMock();
+    registerScript('Fetch Customers', () => {...});
+    registerScript('Find Customer', () => {...});
 
 ## Contribute
 
