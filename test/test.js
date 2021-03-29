@@ -1,8 +1,7 @@
 /* eslint-disable no-undef */
 import { assert } from 'chai';
-import { applyMock, registerScript } from '../src/fm-mock';
+import { registerScript } from '../src/fm-mock';
 
-applyMock();
 const scriptName = 'My Script';
 const fn = () => 'hello world';
 registerScript('My Script', fn);
@@ -36,12 +35,7 @@ describe('registerScript', () => {
   });
 });
 describe('window.FileMaker.PerformScript', () => {
-  it('should call the mock script', () => {
-    assert.strictEqual(
-      window.FileMaker.PerformScript(scriptName),
-      // fmMock.performScriptWithOption(scriptName),
-      fn(),
-      'function did not return same result'
-    );
+  it('should return undefined, regardless of mock fn return', () => {
+    assert.isUndefined(window.FileMaker.PerformScript(scriptName));
   });
 });

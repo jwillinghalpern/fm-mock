@@ -1,6 +1,4 @@
-import { registerScript, applyMock } from '../../dist/fm-mock.mjs';
-
-applyMock();
+import { registerScript } from '../../dist/fm-mock.mjs';
 
 registerScript('Script 2', () => {
   const cyan = '\x1b[36m%s\x1b[0m';

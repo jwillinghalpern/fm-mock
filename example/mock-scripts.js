@@ -1,8 +1,5 @@
 // For this example, I'm assuming the FMMock dependency is already loaded
 
-// calling applymock replaces window.FileMaker automatically
-FMMock.applyMock();
-
 // Register some mock FM scripts. Note: FM can only pass data via
 //   Perform JavaScript In Webviewer[], so to simulate this only call
 //   global JS functions from here to pass data "back in" to the WV.
