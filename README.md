@@ -29,11 +29,8 @@ Or require the script in your js:
 
 ### Use
 
-Once the code is imported, creating an instance of FMMock will immediately replace the window.FileMaker object and set up an FM mock script registry where you can define mock script logic:
+Once the code is imported, registering mock scripts will immediately replace the window.FileMaker object and the script will be ready to call.
 
-    // first, mock the window.FileMaker object
-    FMMock.applyMock();
-    
     // register some mock scripts
     FMMock.register('Create Record', () => {
         const res = JSON.stringify({"newRecordID": 123});
@@ -48,17 +45,15 @@ Once the code is imported, creating an instance of FMMock will immediately repla
 
 #### Multi-file usage
 
-Because the mock FileMaker object is global, you can register FM scripts within different files. This is useful if your app calls lots of different FileMaker scripts. Running `FMMock.applyMock()` from different files and/or multiple times will not overwrite any previous scripts you've registered, so feel free to import and use FMMock in many files.
+Because the mock FileMaker object is global, you can register FM scripts within different files. This is useful if your app calls lots of different FileMaker scripts.
 
     // file1.js
-    const { applyMock, registerScript } = require('fm-mock');
-    applyMock();
+    const { registerScript } = require('fm-mock');
     registerScript('Create Customer', () => {...});
     registerScript('Delete Customer', () => {...});
 
     // file2.js
-    const { applyMock, registerScript } = require('fm-mock');
-    applyMock();
+    const { registerScript } = require('fm-mock');
     registerScript('Fetch Customers', () => {...});
     registerScript('Find Customer', () => {...});
 
