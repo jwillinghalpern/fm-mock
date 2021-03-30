@@ -5,8 +5,9 @@
   "main": "./dist/fm-mock.js",
   "scripts": {
     "test": "mocha --require esm --require jsdom-global/register",
-    "build": "webpack",
-    "example-multi": "node -r esm -r jsdom-global/register example/multi-file/index.js"
+    "build": "webpack && npm run jsdoc",
+    "example-multi": "node -r esm -r jsdom-global/register example/multi-file/index.js",
+    "jsdoc": "jsdoc -r src -t node_modules/tsd-jsdoc/dist -d dist --package package.json"
   },
   "author": "Josh Willing <josh@willingapps.com>",
   "license": "ISC",
@@ -27,6 +28,7 @@
     "jsdom-global": "3.0.2",
     "mocha": "^8.3.2",
     "prettier": "^2.2.1",
+    "tsd-jsdoc": "^2.5.0",
     "webpack": "^5.28.0",
     "webpack-cli": "^4.5.0"
   }
