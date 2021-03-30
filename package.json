@@ -12,6 +12,7 @@
   "author": "Josh Willing <josh@willingapps.com>",
   "license": "ISC",
   "sourceType": "module",
+  "sideEffects": false,
   "devDependencies": {
     "@babel/core": "^7.13.10",
     "@babel/preset-env": "^7.13.12",
