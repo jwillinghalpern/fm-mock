@@ -27,6 +27,10 @@ Or require the script in your js:
 
     const FMMock = require('fm-mock');
 
+Note, if using npm, this is how you can add the package (for now):
+
+    npm install --save-dev https://github.com/jwillinghalpern/fm-mock
+
 ### Use
 
 Once the code is imported, mocking scripts will immediately replace the window.FileMaker object and the script will be ready to call.
