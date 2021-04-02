@@ -1,6 +1,6 @@
 {
   "name": "fm-mock",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "A framework for mocking the FileMaker webviewer window object for developing and testing fm webviewer apps in browser.",
   "main": "dist/fm-mock.js",
   "module": "dist/fm-mock.mjs",
