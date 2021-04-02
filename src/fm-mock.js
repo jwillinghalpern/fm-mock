@@ -2,6 +2,7 @@
 /* eslint-disable no-undef */
 /**
  * replacement for FileMaker.PerformScriptWithOption
+ * @function
  *
  * @param {string} script
  * @param {string} param
@@ -16,6 +17,7 @@ const performScriptWithOption = (script, param, option) => {
 
 /**
  * replacement for FileMaker.PerformScript
+ * @function
  *
  * @param {string} script
  * @param {string} param
@@ -27,6 +29,7 @@ const performScript = (script, param) => {
 
 /**
  * checks if window.FileMaker is already mocked
+ * @private
  *
  * @returns {boolean} true if already mocked
  */
@@ -35,6 +38,7 @@ const fmIsMock = () =>
 
 /**
  * replace window.FileMaker with this mock
+ * @private
  *
  */
 const mockFileMaker = () => {
@@ -51,6 +55,7 @@ const mockFileMaker = () => {
 /**
  * register a FM script name and the function to call instead when that script
  * is called via FileMaker.PerformScript
+ * @function
  *
  * @param {string} scriptName FM script name
  * @param {function} functionToCall JS function to call instead
