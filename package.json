@@ -4,8 +4,20 @@
   "description": "A framework for mocking the FileMaker webviewer window object for developing and testing fm webviewer apps in browser.",
   "main": "dist/fm-mock.js",
   "module": "dist/fm-mock.mjs",
+  "nyc": {
+    "require": [
+      "@babel/register"
+    ],
+    "reporter": [
+      "html",
+      "text"
+    ],
+    "sourceMap": false,
+    "instrument": false
+  },
   "scripts": {
     "test": "mocha --require esm --require jsdom-global/register",
+    "coverage": "cross-env NODE_ENV=test nyc mocha --require esm --require jsdom-global/register",
     "build": "webpack && npm run jsdoc",
     "example-multi": "node -r esm -r jsdom-global/register example/multi-file/index.js",
     "jsdoc": "jsdoc -r src -t node_modules/tsd-jsdoc/dist -d dist --package package.json"
@@ -17,8 +29,12 @@
   "devDependencies": {
     "@babel/core": "^7.13.10",
     "@babel/preset-env": "^7.13.12",
+    "@babel/register": "^7.13.14",
     "babel-loader": "^8.2.2",
+    "babel-plugin-istanbul": "^6.0.0",
+    "babel-register": "^6.26.0",
     "chai": "^4.3.4",
+    "cross-env": "^7.0.3",
     "eslint": "^7.22.0",
     "eslint-config-airbnb": "^18.2.1",
     "eslint-config-node": "^4.1.0",
@@ -29,6 +45,7 @@
     "jsdom": "16.5.1",
     "jsdom-global": "3.0.2",
     "mocha": "^8.3.2",
+    "nyc": "^15.1.0",
     "prettier": "^2.2.1",
     "tsd-jsdoc": "^2.5.0",
     "webpack": "^5.28.0",

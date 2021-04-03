@@ -1,11 +1,16 @@
 /* eslint-disable no-undef */
-import { assert } from 'chai';
-import { mockScript } from '../src/fm-mock';
+// import * as FMMock from '../src/fm-mock';
+
+const { assert } = require('chai');
+// const FMMock = require('../dist/fm-mock');
+const FMMock = require('../src/fm-mock');
+
+console.log('process.env.NODE_ENV :>> ', process.env.NODE_ENV);
 
 const scriptName = 'My Script';
 const scriptNameLowerCase = scriptName.toLowerCase();
 const fn = () => 'hello world';
-mockScript('My Script', fn);
+FMMock.mockScript('My Script', fn);
 
 describe('mock window.FileMaker', () => {
   it('isMock should be true', () => {
@@ -21,7 +26,7 @@ describe('mock window.FileMaker', () => {
     assert.isFunction(window.FileMaker.PerformScriptWithOption);
   });
 });
-describe('mockScript', () => {
+describe('FMMock.mockScript', () => {
   it('should add a script to window.FileMaker.mockedScripts', () => {
     assert.strictEqual(
       window.FileMaker.mockedScripts[scriptNameLowerCase],

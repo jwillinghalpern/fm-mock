@@ -1,2 +1,4 @@
 example/*
 dist/*
+coverage/*
+.nyc_output/*
