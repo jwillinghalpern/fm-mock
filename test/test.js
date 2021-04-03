@@ -5,8 +5,6 @@ import * as FMMock from '../src/fm-mock';
 // create a virtual dom so we have `window`
 require('jsdom-global')();
 
-console.log('process.env.NODE_ENV :>> ', process.env.NODE_ENV);
-
 const scriptName = 'My Script';
 const scriptNameLowerCase = scriptName.toLowerCase();
 const fn = () => 'hello world';
