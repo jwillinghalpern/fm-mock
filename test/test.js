@@ -1,9 +1,9 @@
 /* eslint-disable no-undef */
-// import * as FMMock from '../src/fm-mock';
+import { assert } from 'chai';
+import * as FMMock from '../src/fm-mock';
 
-const { assert } = require('chai');
-// const FMMock = require('../dist/fm-mock');
-const FMMock = require('../src/fm-mock');
+// create a virtual dom so we have `window`
+require('jsdom-global')();
 
 console.log('process.env.NODE_ENV :>> ', process.env.NODE_ENV);
 
