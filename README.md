@@ -19,6 +19,8 @@ Run `npm run example-multi` to see how it works in a multi-file environment. Loo
 
 ### Import
 
+    npm install --save-dev https://github.com/jwillinghalpern/fm-mock
+
 You can either import the library in a script tag like this:
 
     <script src="path/to/fm-mock.js"></script>
@@ -26,10 +28,6 @@ You can either import the library in a script tag like this:
 Or require the script in your js:
 
     const FMMock = require('fm-mock');
-
-Note, if using npm, this is how you can add the package (for now):
-
-    npm install --save-dev https://github.com/jwillinghalpern/fm-mock
 
 ### Use
 
