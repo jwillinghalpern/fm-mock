@@ -1,12 +1,12 @@
 {
   "name": "fm-mock",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "A framework for mocking the FileMaker webviewer window object for developing and testing fm webviewer apps in browser.",
   "main": "dist/fm-mock.js",
   "module": "dist/fm-mock.mjs",
   "scripts": {
-    "test": "mocha --require esm",
-    "test:coverage": "cross-env NODE_ENV=test nyc mocha",
+    "test-only": "mocha --require esm",
+    "test": "cross-env NODE_ENV=test nyc mocha",
     "build": "webpack && npm run jsdoc",
     "example-multi": "node --require esm --require jsdom-global/register example/multi-file/index.js",
     "jsdoc": "jsdoc -r src -t node_modules/tsd-jsdoc/dist -d dist --package package.json"
@@ -33,6 +33,7 @@
     "@babel/register": "^7.13.14",
     "babel-loader": "^8.2.2",
     "babel-plugin-istanbul": "^6.0.0",
+    "babel-plugin-rewire": "^1.2.0",
     "chai": "^4.3.4",
     "cross-env": "^7.0.3",
     "eslint": "^7.22.0",
@@ -47,6 +48,8 @@
     "mocha": "^8.3.2",
     "nyc": "^15.1.0",
     "prettier": "^2.2.1",
+    "sinon": "^10.0.0",
+    "sinon-chai": "^3.6.0",
     "tsd-jsdoc": "^2.5.0",
     "webpack": "^5.28.0",
     "webpack-cli": "^4.5.0"
