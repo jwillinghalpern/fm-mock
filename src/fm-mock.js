@@ -34,7 +34,7 @@ const performScript = (script, param) => {
  * @returns {boolean} true if already mocked
  */
 const fmIsMock = () =>
-  typeof window.FileMaker === 'object' && window.FileMaker.isMock;
+  !!(typeof window.FileMaker === 'object' && window.FileMaker.isMock);
 
 /**
  * replace window.FileMaker with this mock
