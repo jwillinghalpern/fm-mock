@@ -68,7 +68,7 @@ If you're using React and create-react-app, toggling dev/production is easy:
     if (process.env.NODE_ENV === 'development')
         mockScript('Fetch Records', (param) => { ... });
 
-Now when `npm start` will let you test in the browser, and `npm run build` will create a version ready to use in your FM webviewer with rm-mock disabled.
+Now `npm start` will let you test in the browser, and `npm run build` will create a version ready to use in your FM webviewer with fm-mock removed completely.
 
 ## Test
 
