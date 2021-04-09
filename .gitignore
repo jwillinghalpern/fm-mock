@@ -1,3 +1,5 @@
 node_modules
 coverage/*
 .nyc_output/*
+# Output of 'npm pack'
+*.tgz
