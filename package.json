@@ -7,6 +7,11 @@
   "main": "dist/fm-mock.js",
   "module": "dist/fm-mock.mjs",
   "types": "dist/fm-mock.d.ts",
+  "files": [
+    "dist/*",
+    "test/*",
+    "src/*"
+  ],
   "scripts": {
     "test-only": "mocha --require esm",
     "test": "cross-env NODE_ENV=test nyc mocha",
