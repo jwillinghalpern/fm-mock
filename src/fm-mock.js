@@ -3,6 +3,7 @@
 /**
  * replacement for FileMaker.PerformScriptWithOption
  * @function
+ * @private
  *
  * @param {string} script
  * @param {string} param
@@ -18,6 +19,7 @@ const performScriptWithOption = (script, param, option) => {
 /**
  * replacement for FileMaker.PerformScript
  * @function
+ * @private
  *
  * @param {string} script
  * @param {string} param
