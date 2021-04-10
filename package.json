@@ -5,6 +5,11 @@
   "homepage": "https://github.com/jwillinghalpern/fm-mock#readme",
   "issues": "https://github.com/jwillinghalpern/fm-mock/issues",
   "main": "dist/fm-mock.js",
+  "exports": {
+    "import": "./dist/fm-mock.mjs",
+    "require": "./dist/fm-mock.js",
+    "default": "./dist/fm-mock.js"
+  },
   "module": "dist/fm-mock.mjs",
   "types": "dist/fm-mock.d.ts",
   "files": [
