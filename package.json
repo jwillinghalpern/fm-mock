@@ -20,7 +20,7 @@
     "jsdoc": "jsdoc -r src -t node_modules/tsd-jsdoc/dist -d dist --package package.json",
     "add-export-to-types": "node scripts/add-export-to-types.js"
   },
-  "author": "Josh Willing <josh@willingapps.com>",
+  "author": "Josh Willing Halpern<josh@willingapps.com>",
   "license": "ISC",
   "sourceType": "module",
   "sideEffects": false,
