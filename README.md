@@ -17,10 +17,10 @@ Run `npm run example-multi` to see how it works in a multi-file environment. Loo
 
 ## Usage
 
-### Import
+### Install / Import
 
 ```sh
-npm install --save-dev https://github.com/jwillinghalpern/fm-mock
+npm install --save-dev fm-mock
 ```
 
 You can either import the library in a script tag like this:
