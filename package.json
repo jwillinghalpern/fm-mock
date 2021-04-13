@@ -17,6 +17,15 @@
     "test/*",
     "src/*"
   ],
+  "keywords": [
+    "filemaker",
+    "javascript",
+    "web viewer",
+    "webviewer",
+    "mock",
+    "stub",
+    "browser"
+  ],
   "scripts": {
     "test-only": "mocha --require esm",
     "test": "cross-env NODE_ENV=test nyc mocha",
