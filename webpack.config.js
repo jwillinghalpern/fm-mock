@@ -2,7 +2,7 @@ const path = require('path');
 
 module.exports = [
   {
-    entry: path.resolve(__dirname, 'src/fm-mock.js'),
+    entry: path.resolve(__dirname, 'src/fm-mock.ts'),
     target: 'es5',
     output: {
       globalObject: 'this',
@@ -20,12 +20,17 @@ module.exports = [
           exclude: /node_modules/,
           use: 'babel-loader',
         },
+        {
+          test: /\.(ts)$/,
+          exclude: /node_modules/,
+          use: 'ts-loader',
+        },
       ],
     },
     mode: 'production',
   },
   {
-    entry: path.resolve(__dirname, 'src/fm-mock.js'),
+    entry: path.resolve(__dirname, 'src/fm-mock.ts'),
     output: {
       globalObject: 'this',
       path: path.resolve(__dirname, 'dist'),
@@ -33,6 +38,15 @@ module.exports = [
       library: {
         type: 'module',
       },
+    },
+    module: {
+      rules: [
+        {
+          test: /\.(ts)$/,
+          exclude: /node_modules/,
+          use: 'ts-loader',
+        },
+      ],
     },
     experiments: {
       outputModule: true,

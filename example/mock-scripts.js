@@ -26,8 +26,8 @@ FMMock.mockScript('Fetch Records', (param) => {
     const json = {
       data: [
         { id: 1, name: 'Joshy' },
-        { id: 2, name: 'Bijou' },
-        { id: 3, name: 'Wally' },
+        { id: 2, name: 'Washy' },
+        { id: 3, name: 'Goshy' },
       ],
     };
     const response = JSON.stringify(json, null, 2);

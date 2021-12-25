@@ -5,13 +5,13 @@
   "homepage": "https://github.com/jwillinghalpern/fm-mock#readme",
   "issues": "https://github.com/jwillinghalpern/fm-mock/issues",
   "main": "dist/fm-mock.js",
+  "module": "dist/fm-mock.mjs",
+  "types": "dist/fm-mock.d.ts",
   "exports": {
     "import": "./dist/fm-mock.mjs",
     "require": "./dist/fm-mock.js",
     "default": "./dist/fm-mock.js"
   },
-  "module": "dist/fm-mock.mjs",
-  "types": "dist/fm-mock.d.ts",
   "files": [
     "dist/*",
     "test/*",
@@ -27,37 +27,23 @@
     "browser"
   ],
   "scripts": {
-    "test-only": "mocha --require esm",
-    "test": "cross-env NODE_ENV=test nyc mocha",
-    "build": "webpack && npm run jsdoc && npm run add-export-to-types",
-    "example-multi": "node --require esm --require jsdom-global/register example/multi-file/index.js",
-    "jsdoc": "jsdoc -r src -t node_modules/tsd-jsdoc/dist -d dist --package package.json",
-    "add-export-to-types": "node scripts/add-export-to-types.js"
+    "test": "cross-env NODE_ENV=test jest --coverage",
+    "build": "webpack",
+    "example-multi": "node --require esm --require jsdom-global/register example/multi-file/index.js"
   },
   "author": "Josh Willing Halpern<josh@willingapps.com>",
   "license": "ISC",
   "sourceType": "module",
   "sideEffects": false,
-  "nyc": {
-    "require": [
-      "@babel/register"
-    ],
-    "reporter": [
-      "html",
-      "text",
-      "lcov"
-    ],
-    "sourceMap": false,
-    "instrument": false
-  },
   "devDependencies": {
     "@babel/core": "^7.13.10",
     "@babel/preset-env": "^7.13.12",
+    "@babel/preset-typescript": "^7.16.5",
     "@babel/register": "^7.13.14",
+    "@types/jest": "^27.0.3",
     "babel-loader": "^8.2.2",
     "babel-plugin-istanbul": "^6.0.0",
-    "babel-plugin-rewire": "^1.2.0",
-    "chai": "^4.3.4",
+    "babel-plugin-rewire-ts": "^1.4.0",
     "core-js": "^3.10.1",
     "cross-env": "^7.0.3",
     "eslint": "^7.22.0",
@@ -67,14 +53,12 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^3.3.1",
     "esm": "^3.2.25",
+    "jest": "^27.4.5",
     "jsdom": "16.5.1",
     "jsdom-global": "3.0.2",
-    "mocha": "^8.3.2",
-    "nyc": "^15.1.0",
     "prettier": "^2.2.1",
-    "sinon": "^10.0.0",
-    "sinon-chai": "^3.6.0",
-    "tsd-jsdoc": "^2.5.0",
+    "ts-loader": "^9.2.6",
+    "typescript": "^4.5.4",
     "webpack": "^5.28.0",
     "webpack-cli": "^4.5.0"
   }

@@ -1,0 +1,12 @@
+{
+	"compilerOptions": {
+		"strict": true,
+		"declaration": true,
+		"outDir": "./dist/",
+		"module": "ES6",
+		"target": "ES5"
+	},
+	"include": [
+		"src"
+	],
+}

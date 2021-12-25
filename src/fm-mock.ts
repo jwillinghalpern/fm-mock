@@ -9,8 +9,12 @@
  * @param {string} param
  * @param {number} option
  */
-const performScriptWithOption = (script, param, option) => {
-  const fn = window.FileMaker.mockedScripts[script.toLowerCase()];
+const performScriptWithOption = (
+  script: string,
+  param?: any,
+  option?: ScriptOption
+) => {
+  const fn = window.FileMaker?.mockedScripts?.[script.toLowerCase()];
   if (fn === undefined)
     throw new Error(`The script '${script}' is not registered.`);
   fn(param, option);
@@ -24,7 +28,7 @@ const performScriptWithOption = (script, param, option) => {
  * @param {string} script
  * @param {string} param
  */
-const performScript = (script, param) => {
+const performScript = (script: string, param?: any) => {
   const defaultOption = 0;
   performScriptWithOption(script, param, defaultOption);
 };
@@ -63,7 +67,7 @@ const mockFileMaker = () => {
  * @param {function} functionToCall JS function to call instead
  * @param {string} functionToCall.param param you'd pass to FileMaker
  */
-const mockScript = (scriptName, functionToCall) => {
+const mockScript = (scriptName: string, functionToCall: Function) => {
   if (typeof functionToCall !== 'function')
     throw new Error('must pass in a real function');
   mockFileMaker();
@@ -71,3 +75,19 @@ const mockScript = (scriptName, functionToCall) => {
 };
 
 export { mockScript };
+
+type ScriptOption = 0 | 1 | 2 | 3 | 4 | 5 | '0' | '1' | '2' | '3' | '4' | '5';
+
+declare global {
+  interface Window {
+    FileMaker: {
+      PerformScript: typeof performScript;
+      PerformScriptWithOption: typeof performScriptWithOption;
+      isMock: boolean;
+      mockedScripts: {
+        [key: string]: Function;
+      };
+    };
+    // https://flutterq.com/no-index-signature-with-a-parameter-of-type-string-was-found-on-type/
+  }
+}
