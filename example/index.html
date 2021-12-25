@@ -51,23 +51,30 @@
     </script>
 
     <script>
+      // this is a hacky (but acceptable) way of dynamically loading fm-mock if developing in a browser. Ideally you'd want to use a bundler like Parcel JS instead which can access environment variables like NODE_ENV to determine whether you're in development mode or not.
       (() => {
-        // FM-MOCK, dynamically loaded in html.
-        //   Since mocks should only call global functions anyway, this can be
-        //   loaded in a different scope than the code above.
-        // (There are better ways to load JS with webpack, React/Svelte)
-        let myScript = document.createElement('script');
-        myScript.setAttribute('src', '../dist/fm-mock.js');
-        document.body.appendChild(myScript);
+        setTimeout(() => {
+          if (typeof FileMaker !== 'undefined') {
+            let fmFoundEl = document.createElement('footer');
+            fmFoundEl.className = 'footer success';
+            fmFoundEl.innerText = 'FileMaker detected, NOT using fm-mock';
+            document.body.appendChild(fmFoundEl);
+            return;
+          }
+          let myScript = document.createElement('script');
+          myScript.setAttribute('src', '../dist/fm-mock.js');
+          document.body.appendChild(myScript);
 
-        myScript = document.createElement('script');
-        myScript.setAttribute('src', './mock-scripts.js');
-        document.body.appendChild(myScript);
+          myScript = document.createElement('script');
+          myScript.setAttribute('src', './mock-scripts.js');
+          document.body.appendChild(myScript);
 
-        let mockWarning = document.createElement('footer');
-        mockWarning.className = 'footer';
-        mockWarning.innerText = 'USING MOCK!';
-        document.body.appendChild(mockWarning);
+          let mockWarning = document.createElement('footer');
+          mockWarning.className = 'footer';
+          mockWarning.innerText =
+            'FileMaker not found within one second, USING FM-MOCk!';
+          document.body.appendChild(mockWarning);
+        }, 500);
       })();
     </script>
   </body>
