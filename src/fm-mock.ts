@@ -67,7 +67,10 @@ const mockFileMaker = () => {
  * @param {function} functionToCall JS function to call instead
  * @param {string} functionToCall.param param you'd pass to FileMaker
  */
-const mockScript = (scriptName: string, functionToCall: Function) => {
+const mockScript = (
+  scriptName: string,
+  functionToCall: (param: string) => void
+): void => {
   if (typeof functionToCall !== 'function')
     throw new Error('must pass in a real function');
   mockFileMaker();

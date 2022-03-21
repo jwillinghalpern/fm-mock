@@ -26,7 +26,7 @@ declare const performScript: (script: string, param?: any) => void;
  * @param {function} functionToCall JS function to call instead
  * @param {string} functionToCall.param param you'd pass to FileMaker
  */
-declare const mockScript: (scriptName: string, functionToCall: Function) => void;
+declare const mockScript: (scriptName: string, functionToCall: (param: string) => void) => void;
 export { mockScript };
 declare type ScriptOption = 0 | 1 | 2 | 3 | 4 | 5 | '0' | '1' | '2' | '3' | '4' | '5';
 declare global {

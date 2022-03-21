@@ -3,7 +3,7 @@ const path = require('path');
 module.exports = [
   {
     entry: path.resolve(__dirname, 'src/fm-mock.ts'),
-    target: 'es5',
+    target: ['web', 'es5'],
     output: {
       globalObject: 'this',
       path: path.resolve(__dirname, 'dist'),
