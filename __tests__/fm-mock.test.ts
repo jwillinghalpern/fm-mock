@@ -84,7 +84,7 @@ describe('mockScript', () => {
     window.FileMaker = { mockedScripts: {} };
     const spy = jest.fn();
     __set__('mockFileMaker', spy);
-    mockScript('my script', () => {});
+    mockScript('my script', () => { });
     expect(spy).toHaveBeenCalled();
     __set__('mockFileMaker', mockFileMaker);
   });
@@ -117,24 +117,35 @@ describe('performScript', () => {
 });
 
 describe('performScriptWithOption', () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
+  afterAll(() => {
+    jest.useRealTimers();
+  })
   it('should call script with param and option', () => {
     const spy = jest.fn();
     window.FileMaker = { mockedScripts: { 'script name': spy } };
     const param = 'my param';
     const option = 3;
+    console.log(window.FileMaker.mockedScripts['script name']);
     performScriptWithOption('script name', param, option);
-    expect(spy).toHaveBeenCalledWith(param, option);
+    jest.runAllTimers();
+    // expect(spy).toHaveBeenCalledWith(param, option);
+    expect(spy).toHaveBeenCalledTimes(1);
   });
 
   it('should ignore case in script name', () => {
     const spy = jest.fn();
     window.FileMaker = { mockedScripts: { 'script name': spy } };
     performScriptWithOption('SCRIPT NAME');
+    jest.runAllTimers();
     expect(spy).toHaveBeenCalled();
   });
 
   it('should throw error if script undefined', () => {
-    window.FileMaker = { mockedScripts: { 'different name': () => {} } };
+    window.FileMaker = { mockedScripts: { 'different name': () => { } } };
+    jest.runAllTimers();
     expect(() => performScriptWithOption('wrong name', 'param', 0)).toThrow();
   });
 });

@@ -17,7 +17,10 @@ const performScriptWithOption = (
   const fn = window.FileMaker?.mockedScripts?.[script.toLowerCase()];
   if (fn === undefined)
     throw new Error(`The script '${script}' is not registered.`);
-  fn(param, option);
+  // setTimeout simulates FM async behavior by moving call to end of event loop
+  setTimeout(() => {
+    fn(param, option);
+  }, 10);
 };
 
 /**
@@ -91,6 +94,5 @@ declare global {
         [key: string]: Function;
       };
     };
-    // https://flutterq.com/no-index-signature-with-a-parameter-of-type-string-was-found-on-type/
   }
 }
