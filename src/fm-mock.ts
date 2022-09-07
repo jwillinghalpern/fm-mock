@@ -20,7 +20,7 @@ const performScriptWithOption = (
   // setTimeout simulates FM async behavior by moving call to end of event loop
   setTimeout(() => {
     fn(param, option);
-  }, 10);
+  }, 1);
 };
 
 /**
