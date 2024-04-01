@@ -21,7 +21,13 @@ Run `npm run example-multi` to see how it works in a multi-file environment. Loo
 npm install --save-dev fm-mock
 ```
 
-You can either import the library in a script tag like this:
+Import via ES6 module(preferred):
+
+```javascript
+import { mockScript } from 'fm-mock';
+```
+
+Or import via script tag:
 
 ```html
 <script src="path/to/fm-mock.js"></script>
@@ -51,6 +57,40 @@ window.FileMaker.PerformScript('Create Record', param);
 window.FileMaker.PerformScriptWithOption('Create Record', param, opt);
 ```
 
+#### FMGofer Integration
+
+If you're using [FMGofer](https://github.com/jwillinghalpern/fm-gofer), then
+it's even easier to mock scripts. Use `mockGoferScript` instead of `mockScript`.
+
+```javascript
+import { mockGoferScript } from 'fm-mock';
+
+// can return a value directly!
+// string, number, boolean, object, array, will all be returned as a string just
+// like FM's `Perform JavaScript In Web Viewer` step does
+mockGoferScript('Get Count', 17);
+
+// can pass a function to dynamically generate the return value, like mockScript
+mockGoferScript('Get Count', () => Math.floor(Math.random() * 100));
+// async works too
+mockGoferScript('Get Count', async () => {
+  const res = await fetch('https://api.example.com/count');
+  return await res.text();
+});
+
+// convenient options to simulate different situations like slow scripts and
+// errors that occur in your FM script (like a record lock conflict)
+mockGoferScript('Get Count', 17, {
+  // simulate 2s fm script
+  delay: 2000
+  // simulate 20% chance of error (FMGofer.PerformScript will reject)
+  returnError: Math.random() > 0.8
+  // logs callbackName, promiseID, parameter as would be passed to FM
+  logParams: true
+});
+
+```
+
 #### Multi-file usage
 
 Because the mock FileMaker object is global, you can mock FM scripts within different files. This is useful if your app calls lots of different FileMaker scripts.
@@ -67,23 +107,24 @@ mockScript('Fetch Customers', () => {...});
 mockScript('Find Customer', () => {...});
 ```
 
-#### ReactJS
+#### Vite
 
-If you're using React and create-react-app, toggling dev/production is easy:
+If you're using Vite, toggling dev/production is easy. Use an if statement to only mock scripts in development.
 
 ```javascript
 import { mockScript } from 'fm-mock';
 
-if (process.env.NODE_ENV === 'development')
+if (import.meta.env.DEV) {
     mockScript('Fetch Records', (param) => { ... });
+}
 ```
 
-Now `npm start` will let you test in the browser, and `npm run build` will create a version ready to use in your FM webviewer with fm-mock removed completely.
+Now `npm run dev` will let you test in the browser, and `npm run build` will create a version ready to use in your FM webviewer with fm-mock removed completely.
 
 ## Test
 
 ```sh
-npm run test
+npm test
 ```
 
 ## Contribute
