@@ -80,7 +80,7 @@ const mockScript = (
   window.FileMaker.mockedScripts[scriptName.toLowerCase()] = functionToCall;
 };
 
-export { mockScript };
+export { mockScript, mockGoferScript };
 
 //  mockGoferScript: (
 // 	scriptName: string,
