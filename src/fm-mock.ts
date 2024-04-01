@@ -82,6 +82,72 @@ const mockScript = (
 
 export { mockScript };
 
+//  mockGoferScript: (
+// 	scriptName: string,
+// 	callbackOrResult:
+// 		| Record<string, unknown>
+// 		| number
+// 		| string
+// 		| (({
+// 				callbackName,
+// 				promiseID,
+// 				parameter,
+// 			}: {
+// 				callbackName: string;
+// 				promiseID: string;
+// 				parameter: string;
+// 			}) => void),
+// 	callbackOptions?: { delay?: number } // I think it would be cool to make the delay configurable via options in `mockScript` too. That way I don't have to call setTimeout within the callback to do that.
+// ) => void;
+
+type CallbackFunction = (
+  callbackName: string,
+  promiseID: string,
+  parameter: string
+) => void;
+// // write a function called mockGoferScript that accepts the above call signature, and under the hood, calls mockScript with the scriptName and a function that calls the callbackOrResult function with the correct parameters. The callbackOrResult function should be called with the correct parameters, and the delay should be respected.
+const mockGoferScript = (
+  scriptName: string,
+  callbackOrResult:
+    | Record<string, unknown>
+    | number
+    | string
+    | CallbackFunction,
+  callbackOptions?: { delay?: number }
+) => {
+  console.log('callbackOrResult:', callbackOrResult);
+  if (
+    typeof callbackOrResult === 'string' ||
+    typeof callbackOrResult === 'number' ||
+    typeof callbackOrResult === 'object'
+  ) {
+    mockScript(scriptName, (rawParam: string) => {
+      const { callbackName, promiseID } = JSON.parse(rawParam);
+      setTimeout(() => {
+        if (['object', 'number'].includes(typeof callbackOrResult)) {
+          callbackOrResult = JSON.stringify(callbackOrResult);
+        }
+        // @ts-ignore
+        window[callbackName](promiseID, callbackOrResult);
+      }, callbackOptions?.delay || 0);
+    });
+    return;
+  }
+
+  if (typeof callbackOrResult === 'function') {
+    mockScript(scriptName, (rawParam: string) => {
+      const { callbackName, promiseID, parameter } = JSON.parse(rawParam);
+      setTimeout(() => {
+        if (typeof callbackOrResult !== 'function') {
+          throw new Error('must pass in a real function');
+        }
+        callbackOrResult(callbackName, promiseID, rawParam);
+      }, callbackOptions?.delay || 0);
+    });
+    return;
+  }
+};
+
 type ScriptOption = 0 | 1 | 2 | 3 | 4 | 5 | '0' | '1' | '2' | '3' | '4' | '5';
 
 declare global {
