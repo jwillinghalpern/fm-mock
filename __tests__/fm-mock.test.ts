@@ -81,15 +81,17 @@ describe('mockScript', () => {
   });
 
   it('should mock FileMaker if not already mocked', () => {
+    // @ts-ignore
     window.FileMaker = { mockedScripts: {} };
     const spy = jest.fn();
     __set__('mockFileMaker', spy);
-    mockScript('my script', () => { });
+    mockScript('my script', () => {});
     expect(spy).toHaveBeenCalled();
     __set__('mockFileMaker', mockFileMaker);
   });
 
   it('should store functions keyed by script name in mockedScripts', () => {
+    // @ts-ignore
     window.FileMaker = { isMock: true, mockedScripts: {} };
     __set__('mockFileMaker', jest.fn().mockReturnValue(undefined));
     const spy = jest.fn();
@@ -101,6 +103,19 @@ describe('mockScript', () => {
     expect(spy).toHaveBeenCalled();
     __set__('mockFileMaker', mockFileMaker);
   });
+});
+
+describe('mockGoferScript', () => {
+  test.todo('should return a string');
+  test.todo('should return a number as string');
+  test.todo('should return an object stringified');
+  test.todo('should return an array stringified');
+  test.todo('should return no result and still resolve');
+  test.todo('should run a synchronous function to produce result');
+  test.todo('should run an asynchronous function to produce result');
+  test.todo('should honor options.delay');
+  test.todo('should honor options.logParams');
+  test.todo('should return error when options.returnError');
 });
 
 describe('performScript', () => {
@@ -122,7 +137,7 @@ describe('performScriptWithOption', () => {
   });
   afterAll(() => {
     jest.useRealTimers();
-  })
+  });
   it('should call script with param and option', () => {
     const spy = jest.fn();
     window.FileMaker = { mockedScripts: { 'script name': spy } };
@@ -144,7 +159,7 @@ describe('performScriptWithOption', () => {
   });
 
   it('should throw error if script undefined', () => {
-    window.FileMaker = { mockedScripts: { 'different name': () => { } } };
+    window.FileMaker = { mockedScripts: { 'different name': () => {} } };
     jest.runAllTimers();
     expect(() => performScriptWithOption('wrong name', 'param', 0)).toThrow();
   });
