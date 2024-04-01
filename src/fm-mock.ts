@@ -80,73 +80,58 @@ const mockScript = (
   window.FileMaker.mockedScripts[scriptName.toLowerCase()] = functionToCall;
 };
 
-export { mockScript, mockGoferScript };
-
-//  mockGoferScript: (
-// 	scriptName: string,
-// 	callbackOrResult:
-// 		| Record<string, unknown>
-// 		| number
-// 		| string
-// 		| (({
-// 				callbackName,
-// 				promiseID,
-// 				parameter,
-// 			}: {
-// 				callbackName: string;
-// 				promiseID: string;
-// 				parameter: string;
-// 			}) => void),
-// 	callbackOptions?: { delay?: number } // I think it would be cool to make the delay configurable via options in `mockScript` too. That way I don't have to call setTimeout within the callback to do that.
-// ) => void;
-
-type CallbackFunction = (
-  callbackName: string,
-  promiseID: string,
-  parameter: string
-) => void;
-// // write a function called mockGoferScript that accepts the above call signature, and under the hood, calls mockScript with the scriptName and a function that calls the callbackOrResult function with the correct parameters. The callbackOrResult function should be called with the correct parameters, and the delay should be respected.
+/**
+ * Mocks a script intended to be called via FMGofer. If `resultFromFM` is a function(both async or sync work), it will be executed with the parameter passed to `FMGofer.PerformScript[WithOption]`, and the result will be returned by the mock script. The other types will be stringified and returned as-is, simulating the behavior of FileMaker's `Perform JavaScript In Web Viewer` step, which always passes function parameters as strings.
+ *
+ * @param scriptName - The name of the FM script to mock.
+ * @param resultFromFM - The result FM will return. This can be an object, array, number, string, or a function that accepts a single parameter and returns a result.
+ * @param options - Optional configuration options for the mock script.
+ * @param options.delay - The delay (in milliseconds) before executing the callback function. Defaults to 0. Use to simulate slow FM scripts.
+ * @param options.returnError - If true, the FMGofer.PerformScript[WithOption] call will reject instead of resolve.
+ * @param options.logParams - Specifies whether to log the parameters that will be received by FM.
+ */
 const mockGoferScript = (
   scriptName: string,
-  callbackOrResult:
+  resultFromFM:
     | Record<string, unknown>
+    | any[]
     | number
     | string
-    | CallbackFunction,
-  callbackOptions?: { delay?: number }
+    | ResultFunction
+    | AsyncResultFunction,
+  options?: { delay?: number; returnError?: boolean; logParams?: boolean }
 ) => {
-  console.log('callbackOrResult:', callbackOrResult);
-  if (
-    typeof callbackOrResult === 'string' ||
-    typeof callbackOrResult === 'number' ||
-    typeof callbackOrResult === 'object'
-  ) {
-    mockScript(scriptName, (rawParam: string) => {
-      const { callbackName, promiseID } = JSON.parse(rawParam);
-      setTimeout(() => {
-        if (['object', 'number'].includes(typeof callbackOrResult)) {
-          callbackOrResult = JSON.stringify(callbackOrResult);
-        }
-        // @ts-ignore
-        window[callbackName](promiseID, callbackOrResult);
-      }, callbackOptions?.delay || 0);
-    });
-    return;
-  }
+  mockScript(scriptName, (rawParam: string) => {
+    const { callbackName, promiseID, parameter } = JSON.parse(rawParam);
+    if (options?.logParams) {
+      console.log('callbackName:', callbackName);
+      console.log('promiseID:', promiseID);
+      console.log('parameter:', parameter);
+    }
 
-  if (typeof callbackOrResult === 'function') {
-    mockScript(scriptName, (rawParam: string) => {
-      const { callbackName, promiseID, parameter } = JSON.parse(rawParam);
-      setTimeout(() => {
-        if (typeof callbackOrResult !== 'function') {
-          throw new Error('must pass in a real function');
-        }
-        callbackOrResult(callbackName, promiseID, rawParam);
-      }, callbackOptions?.delay || 0);
-    });
-    return;
-  }
+    setTimeout(async () => {
+      let res =
+        typeof resultFromFM === 'function'
+          ? await resultFromFM(parameter)
+          : resultFromFM;
+
+      if (['object', 'number'].includes(typeof res)) {
+        res = JSON.stringify(res);
+      }
+
+      // @ts-ignore
+      window[callbackName](promiseID, res, options?.returnError || false);
+    }, options?.delay || 0);
+  });
 };
+
+type ResultFunction = (
+  parameter: string
+) => string | number | Record<string, unknown> | void;
+
+type AsyncResultFunction = (
+  ...args: Parameters<ResultFunction>
+) => Promise<ReturnType<ResultFunction>>;
 
 type ScriptOption = 0 | 1 | 2 | 3 | 4 | 5 | '0' | '1' | '2' | '3' | '4' | '5';
 
@@ -162,3 +147,5 @@ declare global {
     };
   }
 }
+
+export { mockScript, mockGoferScript };
