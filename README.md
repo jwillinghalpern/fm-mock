@@ -3,7 +3,7 @@
 WebViewer-less development for WebViewers
 
 A library for mocking the window.FileMaker object. This lets you develop FileMaker webviewer apps in the browser.
-This can be especially useful if you're developiong in a framework like ReactJS and you want to use dev tools in your browser of choice.
+This can be especially useful if you're developing in a framework like ReactJS and you want to use dev tools in your browser of choice.
 
 ## Try
 
