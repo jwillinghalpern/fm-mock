@@ -68,19 +68,26 @@ import { mockGoferScript } from 'fm-mock';
 // can return a value directly!
 // string, number, boolean, object, array, will all be returned as a string just
 // like FM's `Perform JavaScript In Web Viewer` step does
-mockGoferScript('Get Count', 17);
+mockGoferScript('Get Count', {
+  resultFromFM: 17
+});
 
 // can pass a function to dynamically generate the return value, like mockScript
-mockGoferScript('Get Count', () => Math.floor(Math.random() * 100));
+mockGoferScript('Get Count', {
+    resultFromFM: () => Math.floor(Math.random() * 100)
+});
 // async works too
-mockGoferScript('Get Count', async () => {
-  const res = await fetch('https://api.example.com/count');
-  return await res.text();
+mockGoferScript('Get Count', {
+  resultFromFM: async () => {
+    const res = await fetch('https://api.example.com/count');
+    return await res.text();
+  }
 });
 
 // convenient options to simulate different situations like slow scripts and
 // errors that occur in your FM script (like a record lock conflict)
-mockGoferScript('Get Count', 17, {
+mockGoferScript('Get Count', {
+  resultFromFM: 'this might be an error'
   // simulate 2s fm script
   delay: 2000
   // simulate 20% chance of error (FMGofer.PerformScript will reject)
