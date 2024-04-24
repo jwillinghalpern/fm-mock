@@ -84,22 +84,26 @@ const mockScript = (
  * Mocks a script intended to be called via FMGofer. If `resultFromFM` is a function(both async or sync work), it will be executed with the parameter passed to `FMGofer.PerformScript[WithOption]`, and the result will be returned by the mock script. The other types will be stringified and returned as-is, simulating the behavior of FileMaker's `Perform JavaScript In Web Viewer` step, which always passes function parameters as strings.
  *
  * @param scriptName - The name of the FM script to mock.
- * @param resultFromFM - The result FM will return. This can be an object, array, number, string, or a function that accepts a single parameter and returns a result.
  * @param options - Optional configuration options for the mock script.
+ * @param options.resultFromFM - The result FM will return. This can be an object, array, number, string, or a function that accepts a single parameter and returns a result.
  * @param options.delay - The delay (in milliseconds) before executing the callback function. Defaults to 0. Use to simulate slow FM scripts.
  * @param options.returnError - If true, the FMGofer.PerformScript[WithOption] call will reject instead of resolve.
  * @param options.logParams - Specifies whether to log the parameters that will be received by FM.
  */
 const mockGoferScript = (
   scriptName: string,
-  resultFromFM:
-    | Record<string, unknown>
-    | any[]
-    | number
-    | string
-    | ResultFunction
-    | AsyncResultFunction,
-  options?: { delay?: number; returnError?: boolean; logParams?: boolean }
+  options?: {
+    resultFromFM?:
+      | Record<string, unknown>
+      | any[]
+      | number
+      | string
+      | ResultFunction
+      | AsyncResultFunction;
+    delay?: number;
+    returnError?: boolean;
+    logParams?: boolean;
+  }
 ) => {
   mockScript(scriptName, (rawParam: string) => {
     const { callbackName, promiseID, parameter } = JSON.parse(rawParam);
@@ -110,6 +114,7 @@ const mockGoferScript = (
     }
 
     setTimeout(async () => {
+      const resultFromFM = options?.resultFromFM;
       let res =
         typeof resultFromFM === 'function'
           ? await resultFromFM(parameter)
