@@ -87,13 +87,13 @@ mockGoferScript('Get Count', {
 // convenient options to simulate different situations like slow scripts and
 // errors that occur in your FM script (like a record lock conflict)
 mockGoferScript('Get Count', {
-  resultFromFM: 'this might be an error'
+  resultFromFM: 'this might be an error',
   // simulate 2s fm script
-  delay: 2000
+  delay: 2000,
   // simulate 20% chance of error (FMGofer.PerformScript will reject)
-  returnError: Math.random() > 0.8
+  returnError: Math.random() > 0.8,
   // logs callbackName, promiseID, parameter as would be passed to FM
-  logParams: true
+  logParams: true,
 });
 
 ```
