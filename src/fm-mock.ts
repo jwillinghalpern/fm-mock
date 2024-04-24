@@ -69,15 +69,30 @@ const mockFileMaker = () => {
  * @param {string} scriptName FM script name
  * @param {function} functionToCall JS function to call instead
  * @param {string} functionToCall.param param you'd pass to FileMaker
+ * @param {Options} options optional configuration options
+ * @param {number} options.delay delay in milliseconds before executing the callback function
+ * @param {boolean} options.logParams log the parameters received by the mock
  */
 const mockScript = (
   scriptName: string,
-  functionToCall: (param: string) => void
+  functionToCall: (param: string) => void,
+  options?: Options
 ): void => {
-  if (typeof functionToCall !== 'function')
+  if (typeof functionToCall !== 'function') {
     throw new Error('must pass in a real function');
+  }
   mockFileMaker();
-  window.FileMaker.mockedScripts[scriptName.toLowerCase()] = functionToCall;
+
+  const wrappedFunction = (param: string) => {
+    const fn = () => {
+      if (options?.logParams) console.log('param:', param);
+      functionToCall(param);
+    };
+
+    options?.delay ? setTimeout(fn, options.delay) : fn();
+  };
+
+  window.FileMaker.mockedScripts[scriptName.toLowerCase()] = wrappedFunction;
 };
 
 /**
@@ -90,55 +105,85 @@ const mockScript = (
  * @param options.returnError - If true, the FMGofer.PerformScript[WithOption] call will reject instead of resolve.
  * @param options.logParams - Specifies whether to log the parameters that will be received by FM.
  */
-const mockGoferScript = (
-  scriptName: string,
-  options?: {
-    resultFromFM?:
-      | Record<string, unknown>
-      | any[]
-      | number
-      | string
-      | ResultFunction
-      | AsyncResultFunction;
-    delay?: number;
-    returnError?: boolean;
-    logParams?: boolean;
-  }
-) => {
-  mockScript(scriptName, (rawParam: string) => {
-    const { callbackName, promiseID, parameter } = JSON.parse(rawParam);
-    if (options?.logParams) {
-      console.log('callbackName:', callbackName);
-      console.log('promiseID:', promiseID);
-      console.log('parameter:', parameter);
-    }
-
-    setTimeout(async () => {
-      const resultFromFM = options?.resultFromFM;
-      let res =
-        typeof resultFromFM === 'function'
-          ? await resultFromFM(parameter)
-          : resultFromFM;
-
-      if (['object', 'number'].includes(typeof res)) {
-        res = JSON.stringify(res);
+const mockGoferScript = (scriptName: string, options?: GoferOptions) => {
+  mockScript(
+    scriptName,
+    (rawParam: string) => {
+      const { callbackName, promiseID, parameter } = JSON.parse(rawParam);
+      if (options?.logParams) {
+        console.log('callbackName:', callbackName);
+        console.log('promiseID:', promiseID);
+        console.log('parameter:', parameter);
       }
 
-      // @ts-ignore
-      window[callbackName](promiseID, res, options?.returnError || false);
-    }, options?.delay || 0);
-  });
+      const fn = async () => {
+        const resultFromFM = options?.resultFromFM;
+        let res =
+          typeof resultFromFM === 'function'
+            ? await resultFromFM(parameter)
+            : resultFromFM;
+
+        if (['object', 'number'].includes(typeof res)) {
+          res = JSON.stringify(res);
+        }
+
+        // @ts-ignore
+        window[callbackName](promiseID, res, options?.returnError || false);
+      };
+
+      // don't call setTimeout here, as it's already handled in mockScript.
+      // Just pass delay to mockScript.
+      fn();
+    },
+    { delay: options?.delay }
+  );
 };
 
 type ResultFunction = (
   parameter: string
-) => string | number | Record<string, unknown> | void;
+) => string | number | Record<string, unknown> | any[] | void;
 
 type AsyncResultFunction = (
   ...args: Parameters<ResultFunction>
 ) => Promise<ReturnType<ResultFunction>>;
 
 type ScriptOption = 0 | 1 | 2 | 3 | 4 | 5 | '0' | '1' | '2' | '3' | '4' | '5';
+
+/**
+ * Options param for `mockScript`.
+ */
+interface Options {
+  /**
+   * The delay in milliseconds before the callback function is executed. Simulate slow fm scripts.
+   */
+  delay?: number;
+
+  /**
+   * Specifies whether to log the parameters received by the mock.
+   */
+  logParams?: boolean;
+}
+
+/**
+ * Options param for `mockGoferScript`.
+ */
+interface GoferOptions extends Options {
+  /**
+   * The mock result from FM. It can be an object, an array, a number, a string, or a function that produces any of those.
+   */
+  resultFromFM?:
+    | Record<string, unknown>
+    | any[]
+    | number
+    | string
+    | ResultFunction
+    | AsyncResultFunction;
+
+  /**
+   * Specifies whether to return an error.
+   */
+  returnError?: boolean;
+}
 
 declare global {
   interface Window {
