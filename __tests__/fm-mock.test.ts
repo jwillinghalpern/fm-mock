@@ -2,9 +2,10 @@
  * @jest-environment jsdom
  */
 
-import FMGofer from 'fm-gofer';
-import { __get__, __set__, mockGoferScript, mockScript } from '../src/fm-mock';
 import 'regenerator-runtime/runtime';
+// @ts-ignore
+import { __get__, __set__, mockGoferScript, mockScript } from '../src/fm-mock';
+import FMGofer from 'fm-gofer';
 
 // store originals to make restoring them easier later.
 const windowFileMaker = window.FileMaker;
@@ -25,14 +26,16 @@ describe('fmIsMock', () => {
     restoreWindowFileMaker();
   });
   it('should return false if window.FileMaker not object', () => {
+    // @ts-ignore
     delete window.FileMaker;
     expect(fmIsMock()).toBe(false);
   });
   it('should return true when mock', () => {
-    window.FileMaker = { isMock: true };
+    window.FileMaker = { ...window.FileMaker, isMock: true };
     expect(fmIsMock()).toBe(true);
   });
   it('should return false when not mocked', () => {
+    // @ts-ignore
     window.FileMaker = {};
     expect(fmIsMock()).toBe(false);
   });
@@ -40,6 +43,7 @@ describe('fmIsMock', () => {
 
 describe('mockFileMaker', () => {
   beforeEach(() => {
+    // @ts-ignore
     delete window.FileMaker;
   });
   afterEach(() => {
@@ -94,6 +98,7 @@ describe('mockScript', () => {
   });
 
   it("should throw an error if function isn't a function", () => {
+    // @ts-expect-error testing invalid second param
     expect(() => mockScript('my script', 'not a function')).toThrow();
   });
 
@@ -246,7 +251,10 @@ describe('performScriptWithOption', () => {
 
   it('should call script with param and option', () => {
     const spy = jest.fn();
-    window.FileMaker = { mockedScripts: { 'script name': spy } };
+    window.FileMaker = {
+      ...window.FileMaker,
+      mockedScripts: { 'script name': spy },
+    };
     const param = 'my param';
     const option = 3;
     performScriptWithOption('script name', param, option);
@@ -257,14 +265,20 @@ describe('performScriptWithOption', () => {
 
   it('should ignore case in script name', () => {
     const spy = jest.fn();
-    window.FileMaker = { mockedScripts: { 'script name': spy } };
+    window.FileMaker = {
+      ...window.FileMaker,
+      mockedScripts: { 'script name': spy },
+    };
     performScriptWithOption('SCRIPT NAME');
     jest.runAllTimers();
     expect(spy).toHaveBeenCalled();
   });
 
   it('should throw error if script undefined', () => {
-    window.FileMaker = { mockedScripts: { 'different name': () => {} } };
+    window.FileMaker = {
+      ...window.FileMaker,
+      mockedScripts: { 'different name': () => {} },
+    };
     jest.runAllTimers();
     expect(() => performScriptWithOption('wrong name', 'param', 0)).toThrow();
   });
