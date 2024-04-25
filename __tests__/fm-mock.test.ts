@@ -97,6 +97,11 @@ describe('mockScript', () => {
     restoreWindowFileMaker();
   });
 
+  it('should throw an error if function is not provided', () => {
+    // @ts-expect-error testing invalid second param
+    expect(() => mockScript('my script')).toThrow();
+  });
+
   it("should throw an error if function isn't a function", () => {
     // @ts-expect-error testing invalid second param
     expect(() => mockScript('my script', 'not a function')).toThrow();
