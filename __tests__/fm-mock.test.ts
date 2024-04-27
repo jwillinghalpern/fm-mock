@@ -3,8 +3,15 @@
  */
 
 import 'regenerator-runtime/runtime';
-// @ts-ignore
-import { __get__, __set__, mockGoferScript, mockScript } from '../src/fm-mock';
+import {
+  // @ts-ignore
+  __get__,
+  // @ts-ignore
+  __set__,
+  mockGoferScript,
+  mockScript,
+  restoreMocks,
+} from '../src/fm-mock';
 import FMGofer from 'fm-gofer';
 
 // store originals to make restoring them easier later.
@@ -192,6 +199,11 @@ describe('mockGoferScript', () => {
     mockGoferScript('My Script', { resultFromFM: spy });
     expect(FMGofer.PerformScript('My Script')).resolves.toBe('hello world');
   });
+  it('should support dynamic importing files, and json should be returned stringified', async () => {
+    mockGoferScript('My Script', { resultFromFM: () => import('./mock.json') });
+    const imported = JSON.stringify(await import('./mock.json'));
+    expect(FMGofer.PerformScript('My Script')).resolves.toBe(imported);
+  });
   it('should honor options.delay', async () => {
     jest.useFakeTimers();
     const spy = jest.fn().mockReturnValue('hello world');
@@ -225,6 +237,25 @@ describe('mockGoferScript', () => {
       returnError: true,
     });
     expect(FMGofer.PerformScript('My Script')).rejects.toBe('sorry bucko');
+  });
+});
+
+describe('restoreMocks', () => {
+  let fmBefore: typeof window.FileMaker;
+  beforeEach(() => {
+    // @ts-expect-error because I just need to do a referential equality check
+    window.FileMaker = { hello: 123 };
+    fmBefore = window.FileMaker;
+  });
+  it('should do nothing if not mocked', () => {
+    restoreMocks();
+    expect(window.FileMaker).toEqual(fmBefore);
+  });
+  it('should restore window.FileMaker', () => {
+    mockScript('My Script', () => {});
+    expect(window.FileMaker).not.toEqual(fmBefore);
+    restoreMocks();
+    expect(window.FileMaker).toEqual(fmBefore);
   });
 });
 
