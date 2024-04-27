@@ -22,19 +22,21 @@ Run `npm run example-multi` to see how it works in a multi-file environment. Loo
 npm install --save-dev fm-mock
 ```
 
-Import via ES6 module(preferred):
+Import ES Module (preferred):
 
 ```javascript
 import { mockScript } from 'fm-mock';
 ```
 
-Or import via script tag:
+#### Other options
+
+Via script tag:
 
 ```html
 <script src="path/to/fm-mock.js"></script>
 ```
 
-Or require the script in your js:
+CommonJS require:
 
 ```javascript
 const FMMock = require('fm-mock');
@@ -70,19 +72,24 @@ import { mockGoferScript } from 'fm-mock';
 // string, number, boolean, object, array, will all be returned as a string just
 // like FM's `Perform JavaScript In Web Viewer` step does
 mockGoferScript('Get Count', {
-  resultFromFM: 17
+  resultFromFM: 17,
 });
 
 // can pass a function to dynamically generate the return value, like mockScript
 mockGoferScript('Get Count', {
-    resultFromFM: () => Math.floor(Math.random() * 100)
+  resultFromFM: () => Math.floor(Math.random() * 100),
 });
 // async works too
 mockGoferScript('Get Count', {
   resultFromFM: async () => {
     const res = await fetch('https://api.example.com/count');
     return await res.text();
-  }
+  },
+});
+
+// store big json in a separate file
+mockGoferScript('Get Initial Data', {
+  resultFromFM: import('./mocks/initial-data.json'),
 });
 
 // convenient options to simulate different situations like slow scripts and
@@ -96,23 +103,6 @@ mockGoferScript('Get Count', {
   // logs callbackName, promiseID, parameter as would be passed to FM
   logParams: true,
 });
-
-```
-
-#### Multi-file usage
-
-Because the mock FileMaker object is global, you can mock FM scripts within different files. This is useful if your app calls lots of different FileMaker scripts.
-
-```javascript
-// file1.js
-const { mockScript } = require('fm-mock');
-mockScript('Create Customer', () => {...});
-mockScript('Delete Customer', () => {...});
-
-// file2.js
-const { mockScript } = require('fm-mock');
-mockScript('Fetch Customers', () => {...});
-mockScript('Find Customer', () => {...});
 ```
 
 #### Vite
@@ -125,6 +115,16 @@ import { mockScript } from 'fm-mock';
 if (import.meta.env.DEV) {
     mockScript('Fetch Records', (param) => { ... });
 }
+```
+
+#### Restoring window.FileMaker
+
+If you wish to restore the original FileMaker functions, you can. This can be useful if your app has automated tests and you want to restore FileMaker between tests.
+
+```javascript
+import { mockScript, restoreMocks } from 'fm-mock';
+
+restoreMocks();
 ```
 
 Now `npm run dev` will let you test in the browser, and `npm run build` will create a version ready to use in your FM webviewer with fm-mock removed completely.

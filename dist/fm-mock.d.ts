@@ -17,6 +17,7 @@ declare const performScriptWithOption: (script: string, param?: any, option?: Sc
  * @param {string} param
  */
 declare const performScript: (script: string, param?: any) => void;
+declare const restoreMocks: () => void;
 /**
  * register a FM script name and the function to call instead when that script
  * is called via FileMaker.PerformScript
@@ -73,6 +74,7 @@ interface GoferOptions extends Options {
 declare global {
     interface Window {
         FileMaker: {
+            originalFileMaker: any;
             PerformScript: typeof performScript;
             PerformScriptWithOption: typeof performScriptWithOption;
             isMock: boolean;
@@ -82,4 +84,4 @@ declare global {
         };
     }
 }
-export { mockScript, mockGoferScript };
+export { mockScript, mockGoferScript, restoreMocks };

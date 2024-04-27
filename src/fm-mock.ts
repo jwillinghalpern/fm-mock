@@ -52,13 +52,21 @@ const fmIsMock = () =>
  */
 const mockFileMaker = () => {
   if (fmIsMock()) return;
+  const originalFileMaker = window.FileMaker;
   window.FileMaker = {
+    originalFileMaker,
     isMock: true,
     mockedScripts: {},
     PerformScriptWithOption: (script, param, option) =>
       performScriptWithOption(script, param, option),
     PerformScript: (script, param) => performScript(script, param),
   };
+};
+
+const restoreMocks = () => {
+  if (window.FileMaker.isMock) {
+    window.FileMaker = window.FileMaker.originalFileMaker;
+  }
 };
 
 /**
@@ -188,6 +196,7 @@ interface GoferOptions extends Options {
 declare global {
   interface Window {
     FileMaker: {
+      originalFileMaker: any;
       PerformScript: typeof performScript;
       PerformScriptWithOption: typeof performScriptWithOption;
       isMock: boolean;
@@ -198,4 +207,4 @@ declare global {
   }
 }
 
-export { mockScript, mockGoferScript };
+export { mockScript, mockGoferScript, restoreMocks };
