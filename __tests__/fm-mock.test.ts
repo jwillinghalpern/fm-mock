@@ -132,21 +132,24 @@ describe('mockScript', () => {
     const myScript = 'My Script';
     const myScriptLower = myScript.toLowerCase();
     mockScript(myScript, spy);
+    // the function will be wrapped, so check that it's stored by calling it, rather than via .toBe()
     window.FileMaker.mockedScripts[myScriptLower]();
     expect(spy).toHaveBeenCalled();
     __set__('mockFileMaker', mockFileMaker);
   });
 
   it('should log the parameters if that option is set', () => {
-    // should mock console.log and confirm it was called with 'hello world'
+    // the mocked FileMaker.PerformScript runs setTimeout with 1ms delay, so must run timers to completion to test
+    jest.useFakeTimers();
     const consoleSpy = jest.spyOn(console, 'log');
     const spy = jest.fn();
-    const options = { logParams: true };
-    mockScript('my script', () => spy('hello world'), options);
-    window.FileMaker.mockedScripts['my script']('hello world');
+    mockScript('my script', spy, { logParams: true });
+    window.FileMaker.PerformScript('my script', 'hello world');
+    jest.runAllTimers();
     expect(spy).toHaveBeenCalledWith('hello world');
     expect(consoleSpy).toHaveBeenCalledWith('param:', 'hello world');
     consoleSpy.mockRestore();
+    jest.useRealTimers();
   });
 
   it('should delay the function if that option is set', () => {
@@ -154,7 +157,7 @@ describe('mockScript', () => {
     const spy = jest.fn();
     const options = { delay: 1000 };
     mockScript('my script', spy, options);
-    window.FileMaker.mockedScripts['my script']();
+    window.FileMaker.PerformScript('my script');
     expect(spy).not.toHaveBeenCalled();
     jest.advanceTimersByTime(1001);
     expect(spy).toHaveBeenCalled();
@@ -295,7 +298,7 @@ describe('performScriptWithOption', () => {
     const option = 3;
     performScriptWithOption('script name', param, option);
     jest.runAllTimers();
-    // expect(spy).toHaveBeenCalledWith(param, option);
+    expect(spy).toHaveBeenCalledWith(param, option);
     expect(spy).toHaveBeenCalledTimes(1);
   });
 
