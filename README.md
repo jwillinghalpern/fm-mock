@@ -89,7 +89,7 @@ mockGoferScript('Get Count', {
 
 // store big json in a separate file
 mockGoferScript('Get Initial Data', {
-  resultFromFM: import('./mocks/initial-data.json'),
+  resultFromFM: () => import('./mocks/initial-data.json'),
 });
 
 // convenient options to simulate different situations like slow scripts and
