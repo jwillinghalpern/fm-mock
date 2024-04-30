@@ -3,7 +3,8 @@
 WebViewer-less development for WebViewers
 
 A library for mocking the window.FileMaker object. This lets you develop FileMaker webviewer apps in the browser.
-This can be especially useful if you're developing in a framework like ReactJS and you want to use dev tools in your browser of choice.
+
+This can be especially useful if you're developing in a frontend framework like React, Vue, Svelte etc and you want to use dev tools in your browser of choice.
 
 ## Try
 
@@ -21,13 +22,21 @@ Run `npm run example-multi` to see how it works in a multi-file environment. Loo
 npm install --save-dev fm-mock
 ```
 
-You can either import the library in a script tag like this:
+Import ES Module (preferred):
+
+```javascript
+import { mockScript } from 'fm-mock';
+```
+
+#### Other options
+
+Via script tag:
 
 ```html
 <script src="path/to/fm-mock.js"></script>
 ```
 
-Or require the script in your js:
+CommonJS require:
 
 ```javascript
 const FMMock = require('fm-mock');
@@ -51,39 +60,79 @@ window.FileMaker.PerformScript('Create Record', param);
 window.FileMaker.PerformScriptWithOption('Create Record', param, opt);
 ```
 
-#### Multi-file usage
+#### FMGofer Integration
 
-Because the mock FileMaker object is global, you can mock FM scripts within different files. This is useful if your app calls lots of different FileMaker scripts.
+If you're using [FMGofer](https://github.com/jwillinghalpern/fm-gofer), then
+it's even easier to mock scripts. Use `mockGoferScript` instead of `mockScript`.
 
 ```javascript
-// file1.js
-const { mockScript } = require('fm-mock');
-mockScript('Create Customer', () => {...});
-mockScript('Delete Customer', () => {...});
+import { mockGoferScript } from 'fm-mock';
 
-// file2.js
-const { mockScript } = require('fm-mock');
-mockScript('Fetch Customers', () => {...});
-mockScript('Find Customer', () => {...});
+// can return a value directly!
+// string, number, boolean, object, array, will all be returned as a string just
+// like FM's `Perform JavaScript In Web Viewer` step does
+mockGoferScript('Get Count', {
+  resultFromFM: 17,
+});
+
+// can pass a function to dynamically generate the return value, like mockScript
+mockGoferScript('Get Count', {
+  resultFromFM: () => Math.floor(Math.random() * 100),
+});
+// async works too
+mockGoferScript('Get Count', {
+  resultFromFM: async () => {
+    const res = await fetch('https://api.example.com/count');
+    return await res.text();
+  },
+});
+
+// store big json in a separate file
+mockGoferScript('Get Initial Data', {
+  resultFromFM: import('./mocks/initial-data.json'),
+});
+
+// convenient options to simulate different situations like slow scripts and
+// errors that occur in your FM script (like a record lock conflict)
+mockGoferScript('Get Count', {
+  resultFromFM: 'this might be an error',
+  // simulate 2s fm script
+  delay: 2000,
+  // simulate 20% chance of error (FMGofer.PerformScript will reject)
+  returnError: Math.random() > 0.8,
+  // logs callbackName, promiseID, parameter as would be passed to FM
+  logParams: true,
+});
 ```
 
-#### ReactJS
+#### Vite
 
-If you're using React and create-react-app, toggling dev/production is easy:
+If you're using Vite, toggling dev/production is easy. Use an if statement to only mock scripts in development.
 
 ```javascript
 import { mockScript } from 'fm-mock';
 
-if (process.env.NODE_ENV === 'development')
+if (import.meta.env.DEV) {
     mockScript('Fetch Records', (param) => { ... });
+}
 ```
 
-Now `npm start` will let you test in the browser, and `npm run build` will create a version ready to use in your FM webviewer with fm-mock removed completely.
+#### Restoring window.FileMaker
+
+If you wish to restore the original FileMaker functions, you can. This can be useful if your app has automated tests and you want to restore FileMaker between tests.
+
+```javascript
+import { mockScript, restoreMocks } from 'fm-mock';
+
+restoreMocks();
+```
+
+Now `npm run dev` will let you test in the browser, and `npm run build` will create a version ready to use in your FM webviewer with fm-mock removed completely.
 
 ## Test
 
 ```sh
-npm run test
+npm test
 ```
 
 ## Contribute
