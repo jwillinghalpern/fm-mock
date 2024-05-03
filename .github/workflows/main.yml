@@ -1,9 +1,15 @@
 name: Fm mock
 on:
   push:
-    branches: ["main"]
+    branches:
+      - master
+  pull_request:
+    types: [closed]
+    branches:
+      - master
 jobs:
   build:
+    if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.base.ref == 'master'  
     runs-on: ubuntu-latest
     steps:
     - name: Check out the repository
@@ -25,10 +31,28 @@ jobs:
       run: npm ci
     - name: Run Test
       run: npm run test
-    - name: Example Multi
-      run: npm run example-multi
     - name: Build
       run: npm run build
-    - uses: Songmu/tagpr@v1
+    - name: 'Cat package.json'
+      run: cat ./package.json
+    - name: 'Automated Version Bump'
+      id: version-bump
+      uses: 'phips28/gh-action-bump-version@master'
+      with:
+        tag-prefix: 'v'
+        minor-wording:  'add,Adds,new'  
+        major-wording:  'MAJOR,cut-major'
+        patch-wording:  'patch,fixes'
+        rc-wording:     'release,alpha'
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}    
+    - name: 'Cat package.json'
+      run: cat ./package.json      
+    - name: 'Output new tag'
+      env:
+        NEW_TAG: ${{ steps.version-bump.outputs.newTag }}
+      run: echo "new tag $NEW_TAG"      
+    - name: Npm publish
+      uses: JS-DevTools/npm-publish@v3
+      with:
+        token: ${{ secrets.NPM_TOKEN }}
