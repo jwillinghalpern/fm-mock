@@ -91,6 +91,10 @@ mockGoferScript('Get Count', {
 mockGoferScript('Get Initial Data', {
   resultFromFM: () => import('./mocks/initial-data.json'),
 });
+// or if the import automatically nests your json inside a `default` key, extract it like this:
+mockGoferScript('Get Initial Data', {
+  resultFromFM: () => import('./mocks/initial-data.json').then((res) => res.default),
+});
 
 // convenient options to simulate different situations like slow scripts and
 // errors that occur in your FM script (like a record lock conflict)
