@@ -42,7 +42,7 @@ declare const mockScript: (scriptName: string, functionToCall: (param: string) =
  * @param options.logParams - Specifies whether to log the parameters that will be received by FM.
  */
 declare const mockGoferScript: (scriptName: string, options?: GoferOptions | undefined) => void;
-declare type ResultFunction = (parameter: string) => string | number | Record<string, unknown> | any[] | void;
+declare type ResultFunction = (parameter: any) => string | number | Record<string, unknown> | any[] | void;
 declare type AsyncResultFunction = (...args: Parameters<ResultFunction>) => Promise<ReturnType<ResultFunction>>;
 declare type ScriptOption = 0 | 1 | 2 | 3 | 4 | 5 | '0' | '1' | '2' | '3' | '4' | '5';
 /**
