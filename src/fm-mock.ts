@@ -148,7 +148,8 @@ const mockGoferScript = (scriptName: string, options?: GoferOptions) => {
 };
 
 type ResultFunction = (
-  parameter: string
+  // parameter is `any` to match FMGofer.PerformScript's `any` parameter type.
+  parameter: any
 ) => string | number | Record<string, unknown> | any[] | void;
 
 type AsyncResultFunction = (
