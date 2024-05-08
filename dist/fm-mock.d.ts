@@ -36,9 +36,9 @@ declare const mockScript: (scriptName: string, functionToCall: (param: string) =
  *
  * @param scriptName - The name of the FM script to mock.
  * @param options - Optional configuration options for the mock script.
- * @param options.resultFromFM - The result FM will return. This can be an object, array, number, string, or a function that accepts a single parameter and returns a result.
+ * @param options.resultFromFM - The result FM will return. This can be an object, array, number, string, or a function that accepts a single parameter and returns a result. If you pass a function and the function throws an error, the promise will be rejected as if FileMaker responded with an error.
  * @param options.delay - The delay (in milliseconds) before executing the callback function. Defaults to 0. Use to simulate slow FM scripts.
- * @param options.returnError - If true, the FMGofer.PerformScript[WithOption] call will reject instead of resolve.
+ * @param options.returnError - If true, the FMGofer.PerformScript[WithOption] call will reject instead of resolve. If `resultFromFM` is a function that throws an error, this option is ignored.
  * @param options.logParams - Specifies whether to log the parameters that will be received by FM.
  */
 declare const mockGoferScript: (scriptName: string, options?: GoferOptions | undefined) => void;

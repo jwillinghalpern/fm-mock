@@ -108,9 +108,9 @@ const mockScript = (
  *
  * @param scriptName - The name of the FM script to mock.
  * @param options - Optional configuration options for the mock script.
- * @param options.resultFromFM - The result FM will return. This can be an object, array, number, string, or a function that accepts a single parameter and returns a result.
+ * @param options.resultFromFM - The result FM will return. This can be an object, array, number, string, or a function that accepts a single parameter and returns a result. If you pass a function and the function throws an error, the promise will be rejected as if FileMaker responded with an error.
  * @param options.delay - The delay (in milliseconds) before executing the callback function. Defaults to 0. Use to simulate slow FM scripts.
- * @param options.returnError - If true, the FMGofer.PerformScript[WithOption] call will reject instead of resolve.
+ * @param options.returnError - If true, the FMGofer.PerformScript[WithOption] call will reject instead of resolve. If `resultFromFM` is a function that throws an error, this option is ignored.
  * @param options.logParams - Specifies whether to log the parameters that will be received by FM.
  */
 const mockGoferScript = (scriptName: string, options?: GoferOptions) => {
@@ -126,17 +126,28 @@ const mockGoferScript = (scriptName: string, options?: GoferOptions) => {
 
       const fn = async () => {
         const resultFromFM = options?.resultFromFM;
-        let res =
-          typeof resultFromFM === 'function'
-            ? await resultFromFM(parameter)
-            : resultFromFM;
+        let res;
+        let returnError = options?.returnError || false;
+
+        // try convert a thrown exception into a fmgofer error callback
+        try {
+          res =
+            typeof resultFromFM === 'function'
+              ? await resultFromFM(parameter)
+              : resultFromFM;
+        } catch (err) {
+          returnError = true;
+          if (err instanceof Error) res = err.message;
+          else if (typeof err === 'string') res = err;
+          else res = err;
+        }
 
         if (['object', 'number'].includes(typeof res)) {
           res = JSON.stringify(res);
         }
 
         // @ts-ignore
-        window[callbackName](promiseID, res, options?.returnError || false);
+        window[callbackName](promiseID, res, returnError);
       };
 
       // don't call setTimeout here, as it's already handled in mockScript.
