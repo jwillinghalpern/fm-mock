@@ -89,7 +89,6 @@ mockGoferScript('Get Count', {
 
 // store big json in a separate file
 mockGoferScript('Get Data', {
-  // NOTE: you might have to access `default` like this, otherwise skip the `then` part
   resultFromFM: () => import('./mocks/data.json').then((res) => res.default),
 });
 
