@@ -88,21 +88,32 @@ mockGoferScript('Get Count', {
 });
 
 // store big json in a separate file
-mockGoferScript('Get Initial Data', {
-  resultFromFM: () => import('./mocks/initial-data.json'),
+mockGoferScript('Get Data', {
+  resultFromFM: () => import('./mocks/data.json').then((res) => res.default),
 });
-// or if the import automatically nests your json inside a `default` key, extract it like this:
-mockGoferScript('Get Initial Data', {
-  resultFromFM: () => import('./mocks/initial-data.json').then((res) => res.default),
+
+// you can dynamically simulate filemaker errors by throwing an error
+mockGoferScript('Get Data', {
+  resultFromFM: (param) => {
+    switch (param.action) {
+      case 'GET_CUSTOMER':
+        return { name: 'John Doe' };
+      case 'GET_ORDER':
+        return { order: '123' };
+      default:
+        throw new Error(`Unknown action: ${param.action}`);
+    }
+  },
 });
 
 // convenient options to simulate different situations like slow scripts and
 // errors that occur in your FM script (like a record lock conflict)
-mockGoferScript('Get Count', {
+mockGoferScript('Get Data', {
   resultFromFM: 'this might be an error',
   // simulate 2s fm script
   delay: 2000,
   // simulate 20% chance of error (FMGofer.PerformScript will reject)
+  // this option is ignored if resultFromFM is a function that throws an error
   returnError: Math.random() > 0.8,
   // logs callbackName, promiseID, parameter as would be passed to FM
   logParams: true,
