@@ -138,7 +138,6 @@ const mockGoferScript = (scriptName: string, options?: GoferOptions) => {
         } catch (err) {
           returnError = true;
           if (err instanceof Error) res = err.message;
-          else if (typeof err === 'string') res = err;
           else res = err;
         }
 

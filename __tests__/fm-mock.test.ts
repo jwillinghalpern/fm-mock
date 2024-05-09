@@ -234,12 +234,42 @@ describe('mockGoferScript', () => {
     expect(consoleSpy).toHaveBeenCalledTimes(3);
     consoleSpy.mockRestore();
   });
-  test('should return error when options.returnError', () => {
+  it('should return error when options.returnError', () => {
     mockGoferScript('My Script', {
       resultFromFM: 'sorry bucko',
       returnError: true,
     });
     expect(FMGofer.PerformScript('My Script')).rejects.toBe('sorry bucko');
+  });
+
+  it('should reject if resultFromFM throws', () => {
+    mockGoferScript('My Script', {
+      resultFromFM: () => {
+        throw 'sorry bucko';
+      },
+    });
+    const res = FMGofer.PerformScript('My Script');
+    return expect(res).rejects.toBe('sorry bucko');
+  });
+
+  it('should reject and stringify result', () => {
+    mockGoferScript('My Script', {
+      resultFromFM: () => {
+        throw 123;
+      },
+    });
+    const res = FMGofer.PerformScript('My Script');
+    return expect(res).rejects.toBe('123');
+  });
+
+  it('should reject if resultFromFM throws an Error object and return Error.message', () => {
+    mockGoferScript('My Script', {
+      resultFromFM: () => {
+        throw new Error('sorry bucko');
+      },
+    });
+    const res = FMGofer.PerformScript('My Script');
+    return expect(res).rejects.toBe('sorry bucko');
   });
 });
 
