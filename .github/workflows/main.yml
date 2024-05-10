@@ -1,58 +1,34 @@
-name: Fm mock
+name: Publish To NPM
+
 on:
-  push:
-    branches:
-      - master
-  pull_request:
-    types: [closed]
-    branches:
-      - master
+  release:
+    types: [created]
+
 jobs:
   build:
-    if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.base.ref == 'master'  
     runs-on: ubuntu-latest
     steps:
-    - name: Check out the repository
-      uses: actions/checkout@v4
-    - name: Install NodeJs
-      uses: actions/setup-node@v4
-      with:
-        node-version-file: '.nvmrc'
-        node-version: 18
-        cache: 'npm'
-    - name: Cache NPM dependencies
-      uses: actions/cache@v3
-      id: cache-primes
-      with:
-        path: node_modules
-        key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}      
-    - name: Install dependencies
-      if: steps.cache-primes.outputs.cache-hit != 'true'
-      run: npm ci
-    - name: Run Test
-      run: npm run test
-    - name: Build
-      run: npm run build
-    - name: 'Cat package.json'
-      run: cat ./package.json
-    - name: 'Automated Version Bump'
-      id: version-bump
-      uses: 'phips28/gh-action-bump-version@master'
-      with:
-        tag-prefix: 'v'
-        minor-wording:  'add,Adds,new'  
-        major-wording:  'MAJOR,cut-major'
-        patch-wording:  'patch,fixes'
-        rc-wording:     'release,alpha'
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}    
-    - name: 'Cat package.json'
-      run: cat ./package.json      
-    - name: 'Output new tag'
-      env:
-        NEW_TAG: ${{ steps.version-bump.outputs.newTag }}
-      run: echo "new tag $NEW_TAG"      
-    - name: Npm publish
-      uses: JS-DevTools/npm-publish@v3
-      with:
-        token: ${{ secrets.NPM_TOKEN }}
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run build
+      - run: npm test
+
+  publish-npm:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org/
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run build
+      - run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
