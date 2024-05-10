@@ -13,7 +13,8 @@ jobs:
         with:
           node-version: 20
           cache: 'npm'
-      - run: npm ci
+      - name: Clean Install Dependencies
+        run: npm ci
       - run: npm run build
       - run: npm test
 
@@ -27,7 +28,8 @@ jobs:
           node-version: 20
           registry-url: https://registry.npmjs.org/
           cache: 'npm'
-      - run: npm ci
+      - name: Clean Install Dependencies
+        run: npm ci
       - run: npm run build
       - run: npm publish
         env:
