@@ -16,7 +16,7 @@ Run `npm run example-multi` to see how it works in a multi-file environment. Loo
 
 ## Usage
 
-### Install / Import
+### 🏁 Install / Import
 
 ```sh
 npm install --save-dev fm-mock
@@ -42,7 +42,7 @@ CommonJS require:
 const FMMock = require('fm-mock');
 ```
 
-### Use
+### ❇️ Use
 
 Once the code is imported, mocking scripts will immediately replace the window.FileMaker object and the script will be ready to call.
 
@@ -60,10 +60,12 @@ window.FileMaker.PerformScript('Create Record', param);
 window.FileMaker.PerformScriptWithOption('Create Record', param, opt);
 ```
 
-#### FMGofer Integration
+#### 🤓 FMGofer Integration
 
 If you're using [FMGofer](https://github.com/jwillinghalpern/fm-gofer), then
 it's even easier to mock scripts. Use `mockGoferScript` instead of `mockScript`.
+
+##### Quick'n'dirty
 
 ```javascript
 import { mockGoferScript } from 'fm-mock';
@@ -74,8 +76,13 @@ import { mockGoferScript } from 'fm-mock';
 mockGoferScript('Get Count', {
   resultFromFM: 17,
 });
+```
 
-// can pass a function to dynamically generate the return value, like mockScript
+##### Using a function to generate the response
+
+You can pass a function to dynamically generate the return value, like `mockScript`.
+
+```javascript
 mockGoferScript('Get Count', {
   resultFromFM: () => Math.floor(Math.random() * 100),
 });
@@ -86,13 +93,23 @@ mockGoferScript('Get Count', {
     return await res.text();
   },
 });
+```
 
-// store big json in a separate file
+##### Store big json in separate file
+
+This can keep your mocking code cleaner.
+
+```javascript
 mockGoferScript('Get Data', {
   resultFromFM: () => import('./mocks/data.json').then((res) => res.default),
 });
+```
 
-// you can dynamically simulate filemaker errors by throwing an error
+##### Simulate errors from FM
+
+Simply `throw`ing an error in the mock mimics the result of FileMaker calling back with the [FMGofer error](https://github.com/jwillinghalpern/fm-gofer?tab=readme-ov-file#in-your-filemaker-script) parameter set.
+
+```javascript
 mockGoferScript('Get Data', {
   resultFromFM: (param) => {
     switch (param.action) {
@@ -105,17 +122,21 @@ mockGoferScript('Get Data', {
     }
   },
 });
+```
 
-// convenient options to simulate different situations like slow scripts and
-// errors that occur in your FM script (like a record lock conflict)
+##### Other convenient options
+
+Options to simulate different situations like slow scripts and errors that occur in your FM script (like a record lock conflict).
+
+```javascript
 mockGoferScript('Get Data', {
   resultFromFM: 'this might be an error',
-  // simulate 2s fm script
+  // simulate slow 2s fm script
   delay: 2000,
   // simulate 20% chance of error (FMGofer.PerformScript will reject)
   // this option is ignored if resultFromFM is a function that throws an error
   returnError: Math.random() > 0.8,
-  // logs callbackName, promiseID, parameter as would be passed to FM
+  // logs callbackName, promiseID, parameter as would be passed to FM in production
   logParams: true,
 });
 ```
@@ -144,12 +165,12 @@ restoreMocks();
 
 Now `npm run dev` will let you test in the browser, and `npm run build` will create a version ready to use in your FM webviewer with fm-mock removed completely.
 
-## Test
+## 🧪 Test
 
 ```sh
 npm test
 ```
 
-## Contribute
+## 👯 Contribute
 
 If you have any feature ideas or bug fixes, please let me know or send a pull request.
