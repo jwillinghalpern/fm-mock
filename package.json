@@ -36,7 +36,6 @@
     "typecheck": "tsc --noEmit",
     "lint": "biome check .",
     "format": "biome format --write .",
-    "prepublishOnly": "npm run build",
 		"prepare": "npm run build"
   },
   "author": "Josh Willing Halpern<josh@willingapps.com>",
