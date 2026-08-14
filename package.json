@@ -8,14 +8,16 @@
   "module": "dist/fm-mock.mjs",
   "types": "dist/fm-mock.d.ts",
   "exports": {
-    "import": "./dist/fm-mock.mjs",
-    "require": "./dist/fm-mock.js",
-    "default": "./dist/fm-mock.js"
+    ".": {
+      "types": "./dist/fm-mock.d.ts",
+      "import": "./dist/fm-mock.mjs",
+      "require": "./dist/fm-mock.js",
+      "default": "./dist/fm-mock.js"
+    }
   },
   "files": [
-    "dist/*",
-    "test/*",
-    "src/*"
+    "dist",
+    "src"
   ],
   "keywords": [
     "filemaker",
@@ -27,42 +29,28 @@
     "browser"
   ],
   "scripts": {
-    "test": "cross-env NODE_ENV=test jest --coverage",
-    "build": "webpack",
-    "example-multi": "node --require esm --require jsdom-global/register example/multi-file/index.js"
+    "dev": "vite",
+    "build": "vite build && tsc -p tsconfig.build.json",
+    "test": "vitest run --coverage",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check .",
+    "format": "biome format --write .",
+		"prepare": "npm run build"
   },
   "author": "Josh Willing Halpern<josh@willingapps.com>",
   "license": "ISC",
-  "sourceType": "module",
   "sideEffects": false,
+  "engines": {
+    "node": "^20.19.0 || ^22.13.0 || >=24.0.0"
+  },
   "devDependencies": {
-    "@babel/core": "^7.13.10",
-    "@babel/preset-env": "^7.13.12",
-    "@babel/preset-typescript": "^7.16.5",
-    "@babel/register": "^7.13.14",
-    "@types/jest": "^27.0.3",
-    "@types/regenerator-runtime": "^0.13.5",
-    "babel-loader": "^8.2.2",
-    "babel-plugin-istanbul": "^6.0.0",
-    "babel-plugin-rewire-ts": "^1.4.0",
-    "core-js": "^3.10.1",
-    "cross-env": "^7.0.3",
-    "eslint": "^7.22.0",
-    "eslint-config-airbnb": "^18.2.1",
-    "eslint-config-node": "^4.1.0",
-    "eslint-config-prettier": "^8.1.0",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-prettier": "^3.3.1",
-    "esm": "^3.2.25",
-    "fm-gofer": "^1.8.0",
-    "jest": "^27.4.5",
-    "jsdom": "16.5.1",
-    "jsdom-global": "3.0.2",
-    "prettier": "^2.2.1",
-    "regenerator-runtime": "^0.14.1",
-    "ts-loader": "^9.2.6",
-    "typescript": "^4.5.4",
-    "webpack": "^5.28.0",
-    "webpack-cli": "^4.5.0"
+    "@biomejs/biome": "^2.5.8",
+    "@vitest/coverage-v8": "^4.1.10",
+    "fm-gofer": "^1.11.0",
+    "jsdom": "^29.1.1",
+    "typescript": "^7.0.2",
+    "vite": "^8.2.1",
+    "vitest": "^4.1.10"
   }
 }

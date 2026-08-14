@@ -1,0 +1,58 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.5.8/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "files": {
+    "includes": ["**", "!!**/dist", "!!**/coverage", "!**/*.fmp12"]
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "preset": "recommended"
+    }
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single"
+    }
+  },
+  "assist": {
+    "enabled": true,
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
+  },
+  "overrides": [
+    {
+      // fm-mock deliberately mirrors FileMaker's untyped webviewer bridge:
+      // `any` matches FMGofer.PerformScript's own signature, `Function` types
+      // the arbitrary callbacks FM invokes, and `void` in a union is part of
+      // the documented ResultFunction contract. Relaxed here only, so tests
+      // and examples stay on the full recommended set.
+      "includes": ["src/**"],
+      "linter": {
+        "rules": {
+          "complexity": {
+            "noBannedTypes": "off"
+          },
+          "suspicious": {
+            "noConfusingVoidType": "off",
+            "noExplicitAny": "off",
+            "noImplicitAnyLet": "off",
+            "noTsIgnore": "off"
+          }
+        }
+      }
+    }
+  ]
+}

@@ -8,11 +8,16 @@ This can be especially useful if you're developing in a frontend framework like 
 
 ## Try
 
-Open `./example/index.html` in your browser. The javascript in this file calls FileMaker.PerformScript and successfully gets data despite running outside of a webviewer.
+```sh
+npm install
+npm run dev
+```
 
-Open `./example/FMMock.fmp12`. This webviewer runs the same html code, but index.css has been inlined in a `<style>` tag and the last `<script>` block (the one that loads the mock scripts) has been disabled. With that code disabled, the JS uses the default FileMaker.PerformScript and calls real FM scripts.
+Then open the `/example/` URL that Vite prints. The javascript in `./example/main.ts` calls FileMaker.PerformScript and successfully gets data despite running outside of a webviewer.
 
-Run `npm run example-multi` to see how it works in a multi-file environment. Look at `./exampl/multi-file/*` to see how this works.
+The mocks live in `./example/mock-scripts.ts` and are loaded from `./example/main.ts` behind an `import.meta.env.DEV` check, so a production build drops fm-mock entirely.
+
+Open `./example/FMMock.fmp12` to see the same app running in a real webviewer. There, `window.FileMaker` is provided by FileMaker itself, so the mock branch never runs and the JS calls real FM scripts.
 
 ## Usage
 
@@ -165,11 +170,23 @@ restoreMocks();
 
 Now `npm run dev` will let you test in the browser, and `npm run build` will create a version ready to use in your FM webviewer with fm-mock removed completely.
 
-## 🧪 Test
+## 🛠 Develop
+
+This repo uses [Vite](https://vite.dev) for the build and dev server, [Vitest](https://vitest.dev) for tests, and [Biome](https://biomejs.dev) for linting and formatting.
 
 ```sh
-npm test
+npm run dev        # dev server for ./example
+npm test           # run tests once, with coverage
+npm run test:watch # watch mode
+npm run typecheck  # tsc --noEmit over src, tests, and example
+npm run lint       # biome check
+npm run format     # biome format --write
+npm run build      # bundles to ./dist + emits .d.ts
 ```
+
+`npm run build` produces `dist/fm-mock.js` (UMD, global `FMMock`), `dist/fm-mock.mjs` (ES module), and `dist/fm-mock.d.ts`. Both bundles target ES2020, so fm-mock requires a Chromium/WebKit-based webviewer — FileMaker 19.3+ on Windows, or any recent FileMaker on macOS/iOS.
+
+`dist/` is generated and not committed; `npm run build` runs automatically before publish.
 
 ## 👯 Contribute
 

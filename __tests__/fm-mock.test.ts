@@ -1,18 +1,5 @@
-/**
- * @jest-environment jsdom
- */
-
-import 'regenerator-runtime/runtime';
-import {
-  // @ts-ignore
-  __get__,
-  // @ts-ignore
-  __set__,
-  mockGoferScript,
-  mockScript,
-  restoreMocks,
-} from '../src/fm-mock';
 import FMGofer from 'fm-gofer';
+import { mockGoferScript, mockScript, restoreMocks } from '../src/fm-mock';
 
 // store originals to make restoring them easier later.
 const windowFileMaker = window.FileMaker;
@@ -20,82 +7,67 @@ const restoreWindowFileMaker = () => {
   window.FileMaker = windowFileMaker;
 };
 
-const performScriptWithOption = __get__('performScriptWithOption');
-const performScript = __get__('performScript');
-const fmIsMock = __get__('fmIsMock');
-const mockFileMaker = __get__('mockFileMaker');
+const deleteWindowFileMaker = () => {
+  // @ts-expect-error removing the global is exactly what we're simulating
+  delete window.FileMaker;
+};
 
-const fn = () => 'hello world';
-mockScript('My Script', fn);
-
-describe('fmIsMock', () => {
-  afterEach(() => {
-    restoreWindowFileMaker();
-  });
-  it('should return false if window.FileMaker not object', () => {
-    // @ts-ignore
-    delete window.FileMaker;
-    expect(fmIsMock()).toBe(false);
-  });
-  it('should return true when mock', () => {
-    window.FileMaker = { ...window.FileMaker, isMock: true };
-    expect(fmIsMock()).toBe(true);
-  });
-  it('should return false when not mocked', () => {
-    // @ts-ignore
-    window.FileMaker = {};
-    expect(fmIsMock()).toBe(false);
-  });
-});
-
-describe('mockFileMaker', () => {
+describe('mocking window.FileMaker', () => {
   beforeEach(() => {
-    // @ts-ignore
-    delete window.FileMaker;
+    deleteWindowFileMaker();
   });
   afterEach(() => {
     restoreWindowFileMaker();
-  });
-
-  afterAll(() => {
-    __set__('fmIsMock', fmIsMock);
-  });
-
-  it('should exit early if already mocked', () => {
-    const fake = jest.fn().mockReturnValue(true);
-    __set__('fmIsMock', fake);
-    mockFileMaker();
-    expect(fake).toHaveBeenCalledTimes(1);
-    expect(window.FileMaker).toBeUndefined();
   });
 
   it('should add isMock and mockedScripts props', () => {
-    const fake = jest.fn().mockReturnValue(false);
-    __set__('fmIsMock', fake);
-    mockFileMaker();
+    mockScript('my script', () => {});
     expect(window.FileMaker.isMock).toBe(true);
     expect(typeof window.FileMaker.mockedScripts).toBe('object');
     expect(typeof window.FileMaker.PerformScript).toBe('function');
     expect(typeof window.FileMaker.PerformScriptWithOption).toBe('function');
   });
 
-  it('should replace PerformScript and PerformScriptWithOption', () => {
-    const fmIsMockFake = jest.fn().mockReturnValue(false);
-    __set__('fmIsMock', fmIsMockFake);
-    const psSpy = jest.fn();
-    const pswoSpy = jest.fn();
-    __set__('performScript', psSpy);
-    __set__('performScriptWithOption', pswoSpy);
-    mockFileMaker();
-    const myScript = 'my script';
-    const myParam = 'my param';
-    const myOption = 3;
-    window.FileMaker.PerformScript(myScript, myParam);
-    window.FileMaker.PerformScriptWithOption(myScript, myParam, myOption);
-    expect(psSpy).toHaveBeenCalledWith(myScript, myParam);
-    expect(pswoSpy).toHaveBeenCalledWith(myScript, myParam, myOption);
-    __set__('performScript', performScript);
-    __set__('performScriptWithOption', performScriptWithOption);
+  it('should stash the original window.FileMaker when it is not a mock', () => {
+    const original = { hello: 123 };
+    // @ts-expect-error partial FileMaker object, only used for identity
+    window.FileMaker = original;
+    mockScript('my script', () => {});
+    expect(window.FileMaker.isMock).toBe(true);
+    expect(window.FileMaker.originalFileMaker).toBe(original);
+  });
+
+  it('should exit early if already mocked', () => {
+    const sentinel = { hello: 123 };
+    window.FileMaker = {
+      ...window.FileMaker,
+      isMock: true,
+      mockedScripts: {},
+      originalFileMaker: sentinel,
+    };
+    mockScript('my script', () => {});
+    // had it re-mocked, originalFileMaker would now point at the previous mock
+    expect(window.FileMaker.originalFileMaker).toBe(sentinel);
+  });
+
+  it('should route PerformScript to the mocked script', () => {
+    vi.useFakeTimers();
+    const spy = vi.fn();
+    mockScript('My Script', spy);
+    window.FileMaker.PerformScript('My Script', 'my param');
+    vi.runAllTimers();
+    expect(spy).toHaveBeenCalledWith('my param');
+    vi.useRealTimers();
+  });
+
+  it('should route PerformScriptWithOption to the mocked script', () => {
+    vi.useFakeTimers();
+    const spy = vi.fn();
+    mockScript('My Script', spy);
+    window.FileMaker.PerformScriptWithOption('My Script', 'my param', 3);
+    vi.runAllTimers();
+    expect(spy).toHaveBeenCalledWith('my param');
+    vi.useRealTimers();
   });
 });
 
@@ -115,53 +87,44 @@ describe('mockScript', () => {
   });
 
   it('should mock FileMaker if not already mocked', () => {
-    // @ts-ignore
-    window.FileMaker = { mockedScripts: {} };
-    const spy = jest.fn();
-    __set__('mockFileMaker', spy);
+    deleteWindowFileMaker();
     mockScript('my script', () => {});
-    expect(spy).toHaveBeenCalled();
-    __set__('mockFileMaker', mockFileMaker);
+    expect(window.FileMaker.isMock).toBe(true);
   });
 
   it('should store functions keyed by script name in mockedScripts', () => {
-    // @ts-ignore
-    window.FileMaker = { isMock: true, mockedScripts: {} };
-    __set__('mockFileMaker', jest.fn().mockReturnValue(undefined));
-    const spy = jest.fn();
+    const spy = vi.fn();
     const myScript = 'My Script';
-    const myScriptLower = myScript.toLowerCase();
     mockScript(myScript, spy);
     // the function will be wrapped, so check that it's stored by calling it, rather than via .toBe()
-    window.FileMaker.mockedScripts[myScriptLower]();
-    expect(spy).toHaveBeenCalled();
-    __set__('mockFileMaker', mockFileMaker);
+    window.FileMaker.mockedScripts[myScript.toLowerCase()]('my param');
+    expect(spy).toHaveBeenCalledWith('my param');
   });
 
   it('should log the parameters if that option is set', () => {
     // the mocked FileMaker.PerformScript runs setTimeout with 1ms delay, so must run timers to completion to test
-    jest.useFakeTimers();
-    const consoleSpy = jest.spyOn(console, 'log');
-    const spy = jest.fn();
+    vi.useFakeTimers();
+    const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const spy = vi.fn();
     mockScript('my script', spy, { logParams: true });
     window.FileMaker.PerformScript('my script', 'hello world');
-    jest.runAllTimers();
+    vi.runAllTimers();
     expect(spy).toHaveBeenCalledWith('hello world');
     expect(consoleSpy).toHaveBeenCalledWith('param:', 'hello world');
     consoleSpy.mockRestore();
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('should delay the function if that option is set', () => {
-    jest.useFakeTimers();
-    const spy = jest.fn();
+    vi.useFakeTimers();
+    const spy = vi.fn();
     const options = { delay: 1000 };
     mockScript('my script', spy, options);
     window.FileMaker.PerformScript('my script');
     expect(spy).not.toHaveBeenCalled();
-    jest.advanceTimersByTime(1001);
+    vi.advanceTimersByTime(1001);
     expect(spy).toHaveBeenCalled();
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 });
 
@@ -170,62 +133,68 @@ describe('mockGoferScript', () => {
     restoreWindowFileMaker();
   });
 
-  it('should return a string', () => {
+  it('should return a string', async () => {
     mockGoferScript('My Script', { resultFromFM: 'hello world' });
-    expect(FMGofer.PerformScript('My Script')).resolves.toBe('hello world');
-  });
-  it('should return a number as string', () => {
-    mockGoferScript('My Script', { resultFromFM: 42 });
-    expect(FMGofer.PerformScript('My Script')).resolves.toBe('42');
-  });
-  it('should return an object stringified', () => {
-    mockGoferScript('My Script', { resultFromFM: { hello: 'world' } });
-    expect(FMGofer.PerformScript('My Script')).resolves.toBe(
-      '{"hello":"world"}'
+    await expect(FMGofer.PerformScript('My Script')).resolves.toBe(
+      'hello world',
     );
   });
-  it('should return an array stringified', () => {
+  it('should return a number as string', async () => {
+    mockGoferScript('My Script', { resultFromFM: 42 });
+    await expect(FMGofer.PerformScript('My Script')).resolves.toBe('42');
+  });
+  it('should return an object stringified', async () => {
+    mockGoferScript('My Script', { resultFromFM: { hello: 'world' } });
+    await expect(FMGofer.PerformScript('My Script')).resolves.toBe(
+      '{"hello":"world"}',
+    );
+  });
+  it('should return an array stringified', async () => {
     mockGoferScript('My Script', { resultFromFM: [1, 2, 3] });
-    expect(FMGofer.PerformScript('My Script')).resolves.toBe('[1,2,3]');
+    await expect(FMGofer.PerformScript('My Script')).resolves.toBe('[1,2,3]');
   });
-  it('should return no result and still resolve', () => {
+  it('should return no result and still resolve', async () => {
     mockGoferScript('My Script');
-    expect(FMGofer.PerformScript('My Script')).resolves.toBeUndefined();
+    await expect(FMGofer.PerformScript('My Script')).resolves.toBeUndefined();
   });
-  it('should run a synchronous function to produce result', () => {
-    const spy = jest.fn().mockReturnValue('hello world');
+  it('should run a synchronous function to produce result', async () => {
+    const spy = vi.fn().mockReturnValue('hello world');
     mockGoferScript('My Script', { resultFromFM: spy });
-    expect(FMGofer.PerformScript('My Script')).resolves.toBe('hello world');
+    await expect(FMGofer.PerformScript('My Script')).resolves.toBe(
+      'hello world',
+    );
   });
-  it('should run an asynchronous function to produce result', () => {
-    const spy = jest.fn().mockResolvedValue('hello world');
+  it('should run an asynchronous function to produce result', async () => {
+    const spy = vi.fn().mockResolvedValue('hello world');
     mockGoferScript('My Script', { resultFromFM: spy });
-    expect(FMGofer.PerformScript('My Script')).resolves.toBe('hello world');
+    await expect(FMGofer.PerformScript('My Script')).resolves.toBe(
+      'hello world',
+    );
   });
   it('should support dynamic importing files, and json should be returned stringified', async () => {
     mockGoferScript('My Script', { resultFromFM: () => import('./mock.json') });
     const imported = JSON.stringify(await import('./mock.json'));
-    expect(FMGofer.PerformScript('My Script')).resolves.toBe(imported);
+    await expect(FMGofer.PerformScript('My Script')).resolves.toBe(imported);
   });
   it('should honor options.delay', async () => {
-    jest.useFakeTimers();
-    const spy = jest.fn().mockReturnValue('hello world');
+    vi.useFakeTimers();
+    const spy = vi.fn().mockReturnValue('hello world');
     mockGoferScript('My Script', {
       resultFromFM: spy,
       delay: 1000,
     });
     const prom = FMGofer.PerformScript('My Script');
     expect(spy).not.toHaveBeenCalled();
-    jest.advanceTimersByTime(500);
+    await vi.advanceTimersByTimeAsync(500);
     expect(spy).not.toHaveBeenCalled();
-    jest.advanceTimersByTime(503);
+    await vi.advanceTimersByTimeAsync(503);
     expect(spy).toHaveBeenCalled();
     const res = await prom;
     expect(res).toBe('hello world');
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
   it('should honor options.logParams', async () => {
-    const consoleSpy = jest.spyOn(console, 'log');
+    const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
     mockGoferScript('My Script', {
       resultFromFM: 'hello world',
       logParams: true,
@@ -234,42 +203,45 @@ describe('mockGoferScript', () => {
     expect(consoleSpy).toHaveBeenCalledTimes(3);
     consoleSpy.mockRestore();
   });
-  it('should return error when options.returnError', () => {
+  it('should return error when options.returnError', async () => {
     mockGoferScript('My Script', {
       resultFromFM: 'sorry bucko',
       returnError: true,
     });
-    expect(FMGofer.PerformScript('My Script')).rejects.toBe('sorry bucko');
+    await expect(FMGofer.PerformScript('My Script')).rejects.toBe(
+      'sorry bucko',
+    );
   });
 
-  it('should reject if resultFromFM throws', () => {
+  it('should reject if resultFromFM throws', async () => {
     mockGoferScript('My Script', {
       resultFromFM: () => {
         throw 'sorry bucko';
       },
     });
-    const res = FMGofer.PerformScript('My Script');
-    return expect(res).rejects.toBe('sorry bucko');
+    await expect(FMGofer.PerformScript('My Script')).rejects.toBe(
+      'sorry bucko',
+    );
   });
 
-  it('should reject and stringify result', () => {
+  it('should reject and stringify result', async () => {
     mockGoferScript('My Script', {
       resultFromFM: () => {
         throw 123;
       },
     });
-    const res = FMGofer.PerformScript('My Script');
-    return expect(res).rejects.toBe('123');
+    await expect(FMGofer.PerformScript('My Script')).rejects.toBe('123');
   });
 
-  it('should reject if resultFromFM throws an Error object and return Error.message', () => {
+  it('should reject if resultFromFM throws an Error object and return Error.message', async () => {
     mockGoferScript('My Script', {
       resultFromFM: () => {
         throw new Error('sorry bucko');
       },
     });
-    const res = FMGofer.PerformScript('My Script');
-    return expect(res).rejects.toBe('sorry bucko');
+    await expect(FMGofer.PerformScript('My Script')).rejects.toBe(
+      'sorry bucko',
+    );
   });
 });
 
@@ -279,6 +251,9 @@ describe('restoreMocks', () => {
     // @ts-expect-error because I just need to do a referential equality check
     window.FileMaker = { hello: 123 };
     fmBefore = window.FileMaker;
+  });
+  afterEach(() => {
+    restoreWindowFileMaker();
   });
   it('should do nothing if not mocked', () => {
     restoreMocks();
@@ -292,63 +267,62 @@ describe('restoreMocks', () => {
   });
 });
 
-describe('performScript', () => {
+describe('PerformScript', () => {
+  afterEach(() => {
+    restoreWindowFileMaker();
+    vi.useRealTimers();
+  });
+
   it('should use default option 0', () => {
-    const spy = jest.fn();
-    const script = 'My Script';
-    const param = 'My Param';
-    const option = 0;
-    __set__('performScriptWithOption', spy);
-    performScript(script, param);
-    expect(spy).toHaveBeenCalledWith(script, param, option);
-    __set__('performScriptWithOption', performScriptWithOption);
+    vi.useFakeTimers();
+    const spy = vi.fn();
+    // register through the public API, then swap in a bare spy so we can
+    // observe the option argument that mockScript's wrapper discards
+    mockScript('My Script', () => {});
+    window.FileMaker.mockedScripts['my script'] = spy;
+    window.FileMaker.PerformScript('My Script', 'My Param');
+    vi.runAllTimers();
+    expect(spy).toHaveBeenCalledWith('My Param', 0);
   });
 });
 
-describe('performScriptWithOption', () => {
+describe('PerformScriptWithOption', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
+    deleteWindowFileMaker();
+    // seed a mock so window.FileMaker exists, then drive mockedScripts directly
+    mockScript('placeholder', () => {});
   });
 
   afterEach(() => {
     restoreWindowFileMaker();
-  });
-
-  afterAll(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('should call script with param and option', () => {
-    const spy = jest.fn();
-    window.FileMaker = {
-      ...window.FileMaker,
-      mockedScripts: { 'script name': spy },
-    };
+    const spy = vi.fn();
+    window.FileMaker.mockedScripts['script name'] = spy;
     const param = 'my param';
     const option = 3;
-    performScriptWithOption('script name', param, option);
-    jest.runAllTimers();
+    window.FileMaker.PerformScriptWithOption('script name', param, option);
+    vi.runAllTimers();
     expect(spy).toHaveBeenCalledWith(param, option);
     expect(spy).toHaveBeenCalledTimes(1);
   });
 
   it('should ignore case in script name', () => {
-    const spy = jest.fn();
-    window.FileMaker = {
-      ...window.FileMaker,
-      mockedScripts: { 'script name': spy },
-    };
-    performScriptWithOption('SCRIPT NAME');
-    jest.runAllTimers();
+    const spy = vi.fn();
+    window.FileMaker.mockedScripts['script name'] = spy;
+    window.FileMaker.PerformScriptWithOption('SCRIPT NAME');
+    vi.runAllTimers();
     expect(spy).toHaveBeenCalled();
   });
 
   it('should throw error if script undefined', () => {
-    window.FileMaker = {
-      ...window.FileMaker,
-      mockedScripts: { 'different name': () => {} },
-    };
-    jest.runAllTimers();
-    expect(() => performScriptWithOption('wrong name', 'param', 0)).toThrow();
+    window.FileMaker.mockedScripts['different name'] = () => {};
+    vi.runAllTimers();
+    expect(() =>
+      window.FileMaker.PerformScriptWithOption('wrong name', 'param', 0),
+    ).toThrow();
   });
 });

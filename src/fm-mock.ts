@@ -12,7 +12,7 @@
 const performScriptWithOption = (
   script: string,
   param?: any,
-  option?: ScriptOption
+  option?: ScriptOption,
 ) => {
   const fn = window.FileMaker?.mockedScripts?.[script.toLowerCase()];
   if (fn === undefined)
@@ -84,7 +84,7 @@ const restoreMocks = () => {
 const mockScript = (
   scriptName: string,
   functionToCall: (param: string) => void,
-  options?: Options
+  options?: Options,
 ): void => {
   if (typeof functionToCall !== 'function') {
     throw new Error('must pass in a real function');
@@ -153,13 +153,13 @@ const mockGoferScript = (scriptName: string, options?: GoferOptions) => {
       // Just pass delay to mockScript.
       fn();
     },
-    { delay: options?.delay }
+    { delay: options?.delay },
   );
 };
 
 type ResultFunction = (
   // parameter is `any` to match FMGofer.PerformScript's `any` parameter type.
-  parameter: any
+  parameter: any,
 ) => string | number | Record<string, unknown> | any[] | void;
 
 type AsyncResultFunction = (
@@ -218,4 +218,4 @@ declare global {
   }
 }
 
-export { mockScript, mockGoferScript, restoreMocks };
+export { mockGoferScript, mockScript, restoreMocks };
